@@ -62,6 +62,32 @@ The application still contains the **Demo** menu and its pages (10, 11, 20, 21, 
 `PDF_DEMO_*` tables. Without the tables those pages fail when they are opened; the rest (Reports, the designer,
 Try the API, Log, How to Use) works. Hide the *Demo* entry of the navigation menu or delete those pages.
 
+## Installing into your application's own schema (for example an ERP)
+
+No new schema, no grants, no synonyms: your application calls `pdf_api` directly and the designer's
+preview sees your tables.
+
+1. **No name clashes.** Every object is called `PDF_...`. As the application schema:
+   ```sql
+   select object_name, object_type from user_objects where object_name like 'PDF\_%' escape '\';
+   ```
+   must return nothing.
+2. **The objects**, as the application schema, in this order: `10_tables.sql`, `20_pdf_writer.sql`,
+   `30_pdf_engine.sql`, `40_pdf_api.sql`, and `45_pdf_designer.sql` where the designer will run. Leave out
+   `50_demo_data.sql` and `60_samples.sql`: no demo tables or rows in your schema.
+3. **The designer** (development): App Builder > Import `dist/pdf_report_designer.sql` into the same workspace,
+   with a **free application ID** (not the id of your application), **Parsing Schema** = your application's
+   schema, and **without** installing the supporting objects. Hide or delete its *Demo* pages. It is a second
+   application beside yours, on the same schema; your users never see it.
+4. **In your application:** the queries of your reports read your tables and use your page items as binds
+   (`where invoice_id = :P25_INVOICE_ID`); then `pdf_api.generate('ERP_INVOICE')` returns the BLOB and
+   `pdf_api.download('ERP_INVOICE')` in an application process shows it (see the *How to Use* page).
+5. **Production:** the same scripts `10` to `40` in the production schema, then the report rows
+   (`PDF_REPORTS`, `PDF_QUERIES`) and the images (`PDF_IMAGES`), as described below.
+
+**Upgrades:** run the changed scripts again in the same schema. Tables are created only when missing and
+packages are replaced, so your reports and images stay.
+
 ## Production
 
 Production usually needs the engine and your reports, not the designer.
@@ -90,6 +116,6 @@ import the application without supporting objects, as in *B* above.
 | `45_pdf_designer.sql` | yes | yes | only with the designer |
 | `50_demo_data.sql`, `60_samples.sql` | yes | no | no |
 | Designer application | yes, with supporting objects | yes, without supporting objects; hide *Demo* | optional |
-| Grant + synonym per application schema | when in a schema of its own | when in a schema of its own | when in a schema of its own |
+| Grant + synonym per application schema | only when in a schema of its own (not needed in your application's schema) | same | same |
 | Report rows (`PDF_REPORTS`, `PDF_QUERIES`) | made in the designer | made in the designer | exported / copied from development |
 | Image rows (`PDF_IMAGES`) | uploaded in the designer | uploaded in the designer | copied from development |
