@@ -36,8 +36,12 @@
 #vinaura-lp .va-cmp-bar span em{font-style:normal;color:var(--muted);font-weight:500}
 #vinaura-lp .va-show-stage{aspect-ratio:2400/1500}
 
-#vinaura-lp .va-byline{margin-top:18px;font-size:14.5px;color:rgba(255,255,255,.78)}
-#vinaura-lp .va-byline a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+#vinaura-lp .va-byline{margin-top:20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 18px;font-size:14.5px;color:rgba(255,255,255,.78)}
+#vinaura-lp .va-byline .va-free{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:500;text-decoration:none;transition:background .2s ease,transform .2s ease}
+#vinaura-lp .va-byline .va-free:hover{background:rgba(255,255,255,.24);transform:translateY(-1px);color:#fff}
+#vinaura-lp .va-byline .va-free svg{width:24px;height:24px;padding:4px;border-radius:50%;background:#fff;color:#0f1726}
+#vinaura-lp .va-byline .va-free b{padding:3px 8px;border-radius:999px;background:#7fe3c8;color:#0b3b33;font:700 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase}
+#vinaura-lp .va-by a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 
 /* development and production */
 #vinaura-lp .va-env{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:stretch}
