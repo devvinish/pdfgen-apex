@@ -62,6 +62,7 @@ class Ctx:
         self.lov_reports = new()
         self.group_main = new()
         self.group_demo = new()
+        self.demo_auth = new()
         self.demo_lovs = {n: new() for n in demo_pages.LOVS}
         self.lov_products = self.demo_lovs['DEMO_PRODUCTS']
 
@@ -148,21 +149,24 @@ def lists(exp, ctx):
     exp.prompt('shared_components/navigation/lists/navigation_menu')
     calls = [call('wwv_flow_imp_shared.create_list', [
         ('p_id', wid(ctx.nav_list)), ('p_name', 'Navigation Menu'), ('p_static_id', 'navigation-menu')])]
-    def entry(seq, label, page, ic, pages, parent=None):
+    def entry(seq, label, page, ic, pages, parent=None, auth=None):
         iid = new()
         calls.append(call('wwv_flow_imp_shared.create_list_item', [
             ('p_id', wid(iid)), ('p_list_item_display_sequence', seq), ('p_list_item_link_text', label),
             ('p_static_id', static_id(label, used)),
             ('p_list_item_link_target', 'f?p=&APP_ID.:%d:&SESSION.::&DEBUG.:::' % page if page else None),
             ('p_list_item_icon', ic), ('p_parent_list_item_id', wid(parent) if parent else None),
+            ('p_security_scheme', wid(auth) if auth else None),
             ('p_list_item_current_type', 'COLON_DELIMITED_PAGE_LIST' if page else 'TARGET_PAGE'),
             ('p_list_item_current_for_pages', pages)]))
         return iid
 
     for n, (label, page, ic, pages, kids) in enumerate(NAV, 1):
-        parent = entry(n * 10, label, page, ic, pages)
+        # the Demo menu shows only when the demo tables are installed
+        auth = ctx.demo_auth if label == 'Demo' else None
+        parent = entry(n * 10, label, page, ic, pages, auth=auth)
         for k, (kl, kp, ki, kpages) in enumerate(kids or [], 1):
-            entry(k * 10, kl, kp, ki, kpages, parent)
+            entry(k * 10, kl, kp, ki, kpages, parent, auth=auth)
     exp.block(*calls)
     exp.prompt('shared_components/navigation/lists/navigation_bar')
     used2 = set()
@@ -193,6 +197,26 @@ def static_files(exp, ctx):
             ('p_file_content', Raw('wwv_flow_imp.varchar2_to_blob(wwv_flow_imp.g_varchar2_table)'))]))
 
 
+DEMO_INSTALLED = """-- the Demo menu and pages need the demo tables (sql/50_demo_data.sql, sql/60_samples.sql)
+declare
+  l number;
+begin
+  select count(*) into l from user_tables
+   where table_name in ('PDF_DEMO_CUSTOMERS', 'PDF_DEMO_PRODUCTS', 'PDF_DEMO_INVOICES', 'PDF_DEMO_INVOICE_LINES');
+  return l = 4;
+end;"""
+
+
+def security(exp, ctx):
+    exp.prompt('shared_components/security/authorizations/demo_installed')
+    exp.block(call('wwv_flow_imp_shared.create_security_scheme', [
+        ('p_id', wid(ctx.demo_auth)), ('p_name', 'Demo installed'), ('p_static_id', 'demo-installed'),
+        ('p_scheme_type', 'NATIVE_FUNCTION_BODY'), ('p_attributes', attrs({'plsql_function_body': DEMO_INSTALLED})),
+        ('p_error_message', 'The demo is not installed: run sql/50_demo_data.sql and sql/60_samples.sql '
+                            '(or import the application with its supporting objects).'),
+        ('p_caching', 'BY_USER_BY_PAGE_VIEW')]))
+
+
 # the Ajax calls of the designer (app/designer.js)
 PROCESSES = [
     ('LOAD_REPORT', 'pdf_designer.load_report(apex_application.g_x01);'),
@@ -206,12 +230,14 @@ PROCESSES = [
 
 
 def logic(exp, ctx):
+    demo = {name for name, _ in demo_pages.APP_PROCESSES}
     for n, (name, plsql) in enumerate(PROCESSES + demo_pages.APP_PROCESSES, 1):
         exp.prompt('shared_components/logic/application_processes/' + name.lower())
         exp.block(call('wwv_flow_imp_shared.create_flow_process', [
             ('p_id', wid(ctx.app.ids.new())), ('p_process_sequence', n), ('p_process_point', 'ON_DEMAND'),
             ('p_process_name', name), ('p_static_id', name.lower().replace('_', '-')),
-            ('p_process_sql_clob', plsql), ('p_process_clob_language', 'PLSQL')]))
+            ('p_process_sql_clob', plsql), ('p_process_clob_language', 'PLSQL'),
+            ('p_security_scheme', wid(ctx.demo_auth) if name in demo else None)]))
     for p in ('shared_components/logic/application_settings', 'shared_components/navigation/tabs/standard',
               'shared_components/navigation/tabs/parent'):
         exp.prompt(p)
@@ -632,8 +658,7 @@ def build(app_id, no_auth, name, alias, with_objects):
     plugin_settings(exp, ctx)
     lists(exp, ctx)
     static_files(exp, ctx)
-    exp.prompt('shared_components/security/authorizations')
-    exp.block()
+    security(exp, ctx)
     exp.prompt('shared_components/navigation/navigation_bar')
     exp.block()
     logic(exp, ctx)

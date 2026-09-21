@@ -46,7 +46,7 @@ def pdf_url(process, items=None, values=None):
 
 def pdf_dialog(ctx, pid, name, alias, process, items):
     """the modal page: its items (set by the caller), a URL region on the process, Close and New tab"""
-    p = Page(ctx.app, pid, name, alias, title=name, mode='MODAL', group=ctx.group_demo, component_map='03',
+    p = Page(ctx.app, pid, name, alias, title=name, mode='MODAL', group=ctx.group_demo, auth=ctx.demo_auth, component_map='03',
              dialog_width='1100', inline_css=DIALOG_CSS)
     p.head.append(('p_dialog_height', '800'))
     r = p._plug('PDF', p_region_template_options='#DEFAULT#', p_escape_on_http_output='N',
@@ -106,7 +106,7 @@ INVOICES_SQL = """select i.invoice_id, i.invoice_no, i.invoice_date, i.due_date,
   join pdf_demo_customers c on c.customer_id = i.customer_id"""
 
 def page_invoices(ctx):
-    p = Page(ctx.app, 10, 'Invoices', 'INVOICES', title='Invoices', group=ctx.group_demo, component_map='18')
+    p = Page(ctx.app, 10, 'Invoices', 'INVOICES', title='Invoices', group=ctx.group_demo, auth=ctx.demo_auth, component_map='18')
     b = p.static('Print the Invoices of a Period', seq=5, options='#DEFAULT#:t-Region--scrollBody')
     p.item('P10_DATE_FROM', b, kind='date', label='From', colspan=3)
     p.item('P10_DATE_TO', b, kind='date', label='To', colspan=3, new_line='N')
@@ -224,7 +224,7 @@ def form_buttons(p, bar, key_item, list_page, what):
 
 
 def page_invoice(ctx):
-    p = Page(ctx.app, 11, 'Invoice', 'INVOICE', title='Invoice', group=ctx.group_demo, component_map='03',
+    p = Page(ctx.app, 11, 'Invoice', 'INVOICE', title='Invoice', group=ctx.group_demo, auth=ctx.demo_auth, component_map='03',
              inline_css=INVOICE_CSS)
     bar = p.buttons_bar(seq=1)
     save, create = form_buttons(p, bar, 'P11_INVOICE_ID', 10, 'invoice and all its lines')
@@ -280,7 +280,7 @@ CUSTOMERS_SQL = """select c.customer_id, c.name, c.city, c.state, c.gstin, c.pho
 
 
 def page_customers(ctx):
-    p = Page(ctx.app, 20, 'Customers', 'CUSTOMERS', title='Customers', group=ctx.group_demo, component_map='18')
+    p = Page(ctx.app, 20, 'Customers', 'CUSTOMERS', title='Customers', group=ctx.group_demo, auth=ctx.demo_auth, component_map='18')
     r = p.ir('Customers', CUSTOMERS_SQL, [
         dict(name='CUSTOMER_ID', hidden=True),
         dict(name='NAME', label='Customer'),
@@ -324,7 +324,7 @@ CUSTOMER_INVOICES = """select i.invoice_id, i.invoice_no, i.invoice_date, initca
 
 
 def page_customer(ctx):
-    p = Page(ctx.app, 21, 'Customer', 'CUSTOMER', title='Customer', group=ctx.group_demo, component_map='03')
+    p = Page(ctx.app, 21, 'Customer', 'CUSTOMER', title='Customer', group=ctx.group_demo, auth=ctx.demo_auth, component_map='03')
     bar = p.buttons_bar(seq=1)
     save, create = form_buttons(p, bar, 'P21_CUSTOMER_ID', 20, 'customer')
     pdf_buttons(p, bar, 93, 'STATEMENT_PDF', 'P93_CUSTOMER_ID', '&P21_CUSTOMER_ID.', 'P21_CUSTOMER_ID', 'Statement')
@@ -371,7 +371,7 @@ PRODUCTS_SQL = """select p.product_id, p.sku, p.name, p.category, p.hsn, p.unit,
   from pdf_demo_products p"""
 
 def page_products(ctx):
-    p = Page(ctx.app, 30, 'Products', 'PRODUCTS', title='Products', group=ctx.group_demo, component_map='18')
+    p = Page(ctx.app, 30, 'Products', 'PRODUCTS', title='Products', group=ctx.group_demo, auth=ctx.demo_auth, component_map='18')
     b = p.static('Print Shelf Labels', seq=5, options='#DEFAULT#:t-Region--scrollBody')
     p.item('P30_CATEGORY', b, kind='select', label='Category', named_lov='DEMO_CATEGORIES', lov_null='- all -',
            colspan=4, attrs_={'page_action_on_selection': 'NONE'})
@@ -417,7 +417,7 @@ PRODUCT_SAVE = """update pdf_demo_products
 
 
 def page_product(ctx):
-    p = Page(ctx.app, 31, 'Product', 'PRODUCT', title='Product', group=ctx.group_demo, component_map='03')
+    p = Page(ctx.app, 31, 'Product', 'PRODUCT', title='Product', group=ctx.group_demo, auth=ctx.demo_auth, component_map='03')
     bar = p.buttons_bar(seq=1)
     save, create = form_buttons(p, bar, 'P31_PRODUCT_ID', 30, 'product')
     pdf_buttons(p, bar, 94, 'LABEL_PDF', 'P94_SKU', '&P31_SKU.', 'P31_PRODUCT_ID', 'Label')

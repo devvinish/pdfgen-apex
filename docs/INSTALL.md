@@ -57,10 +57,12 @@ sample reports.
 1. Run `10`, `20`, `30`, `40` and `45` in SQL Developer / SQLcl as the owning schema.
 2. Import `dist/pdf_report_designer.sql` **without** installing the supporting objects.
 
-The application still contains the **Demo** menu and its pages (10, 11, 20, 21, 30, 31 and the PDF dialogs
-92 to 96) and three lists of values (`DEMO_CUSTOMERS`, `DEMO_PRODUCTS`, `DEMO_CATEGORIES`) that read the
-`PDF_DEMO_*` tables. Without the tables those pages fail when they are opened; the rest (Reports, the designer,
-Try the API, Log, How to Use) works. Hide the *Demo* entry of the navigation menu or delete those pages.
+Nothing else to do. The **Demo** menu, its pages (10, 11, 20, 21, 30, 31, the PDF dialogs 92 to 96) and their
+application processes are protected by the authorization scheme **Demo installed**, which is true only when the
+four `PDF_DEMO_*` tables exist. Without them the Demo menu does not show, and a demo page opened by its URL
+says *The demo is not installed*. Reports, the designer, Try the API, Log and How to Use work as usual.
+
+To add the demo later, run `50_demo_data.sql` and `60_samples.sql`: the Demo menu appears on the next page.
 
 ## Installing into your application's own schema (for example an ERP)
 
@@ -77,8 +79,8 @@ preview sees your tables.
    `50_demo_data.sql` and `60_samples.sql`: no demo tables or rows in your schema.
 3. **The designer** (development): App Builder > Import `dist/pdf_report_designer.sql` into the same workspace,
    with a **free application ID** (not the id of your application), **Parsing Schema** = your application's
-   schema, and **without** installing the supporting objects. Hide or delete its *Demo* pages. It is a second
-   application beside yours, on the same schema; your users never see it.
+   schema, and **without** installing the supporting objects. Its *Demo* menu stays hidden (no demo tables).
+   It is a second application beside yours, on the same schema; your users never see it.
 4. **In your application:** the queries of your reports read your tables and use your page items as binds
    (`where invoice_id = :P25_INVOICE_ID`); then `pdf_api.generate('ERP_INVOICE')` returns the BLOB and
    `pdf_api.download('ERP_INVOICE')` in an application process shows it (see the *How to Use* page).
@@ -115,7 +117,7 @@ import the application without supporting objects, as in *B* above.
 | `10`, `20`, `30`, `40` | yes | yes | yes |
 | `45_pdf_designer.sql` | yes | yes | only with the designer |
 | `50_demo_data.sql`, `60_samples.sql` | yes | no | no |
-| Designer application | yes, with supporting objects | yes, without supporting objects; hide *Demo* | optional |
+| Designer application | yes, with supporting objects | yes, without supporting objects (*Demo* hides itself) | optional |
 | Grant + synonym per application schema | only when in a schema of its own (not needed in your application's schema) | same | same |
 | Report rows (`PDF_REPORTS`, `PDF_QUERIES`) | made in the designer | made in the designer | exported / copied from development |
 | Image rows (`PDF_IMAGES`) | uploaded in the designer | uploaded in the designer | copied from development |
