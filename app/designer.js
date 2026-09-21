@@ -570,8 +570,12 @@ window.pdfd = (function ($) {
     };
   }
 
+  // a field on the canvas: {Q1.AMOUNT} in the colour of its element; a format ({Q1.AMOUNT|FM990D00}) is
+  // left out of the text and shown on hover
   function tokenHtml(text) {
-    return esc(text).replace(/\{([^}]+)\}/g, '<span class="pdfd-tok">{$1}</span>');
+    return esc(text).replace(/\{([^}|]+)(\|([^}]*))?\}/g, function (m, name, x, mask) {
+      return '<span class="pdfd-tok"' + (mask ? ' title="Format: ' + mask + '"' : '') + '>{' + name + '}</span>';
+    });
   }
 
   function frameCss(e) {
@@ -590,7 +594,8 @@ window.pdfd = (function ($) {
     var isSel = S.sel.indexOf(e.id) >= 0;
     var div = h('div', {
       class: 'pdfd-el pdfd-el--' + e.type + (isSel ? ' is-selected' : '') + (e.printWhen ? ' has-cond' : ''),
-      'data-id': e.id, 'data-band': bandName, tabindex: '-1', title: e.printWhen ? 'Printed when ' + e.printWhen : null
+      'data-id': e.id, 'data-band': bandName, tabindex: '-1',
+      title: [e.format ? 'Format: ' + e.format : null, e.printWhen ? 'Printed when ' + e.printWhen : null].filter(Boolean).join('\n') || null
     });
     var x = e.x, y = e.y, w = e.w, hh = e.h;
     if (e.type === 'line') {
@@ -617,7 +622,6 @@ window.pdfd = (function ($) {
         lineHeight: e.lineHeight || 1.2
       });
       div.appendChild(inner);
-      if (e.format) { div.appendChild(h('span', { class: 'pdfd-badge', text: e.format })); }
     } else if (e.type === 'box') {
       Object.assign(div.style, frameCss(e));
     } else if (e.type === 'ellipse') {
