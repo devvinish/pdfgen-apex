@@ -1,0 +1,1779 @@
+<!--
+  VinAura landing page - paste everything in this file into a WordPress "Custom HTML" block.
+
+  1. The pictures are linked straight from the WordPress media library:
+       https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp ... (upload every file of landing/images)
+  2. The form posts to data-endpoint: the Rounds lead mailer plugin, version 2.1.0 or later,
+     which knows the product, company, country and licence fields (see landing/README.md).
+     If it can't be reached, the form offers an e-mail link to data-fallback-email (leave it
+     empty to show no address on the public page).
+  Built by tools/build_landing.py from landing/src - edit the sources, not this file.
+-->
+<div id="vinaura-lp" class="alignfull"
+     data-endpoint="/wp-json/rounds/v1/lead"
+     data-fallback-email="">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+#vinaura-lp{
+  --ink:#0f1b2d; --ink-2:#34445a; --muted:#627089; --line:#e2e8f0; --line-2:#d3dbe6;
+  --bg:#ffffff; --soft:#f5f7fb; --soft-2:#eef2f8;
+  --brand:#1f5fd6; --brand-ink:#15459e; --brand-soft:#e8effc;
+  --slate:#2e3a4b; --teal:#0f8a7e; --mustard:#b98a2c; --violet:#7a5b9a;
+  --terra:#b8603f; --green:#5f8a45; --rose:#b34b5c; --navy:#3f5b93;
+  --radius:14px; --shadow:0 1px 2px rgba(15,27,45,.06),0 8px 24px -8px rgba(15,27,45,.12);
+  --shadow-lg:0 2px 4px rgba(15,27,45,.05),0 30px 60px -20px rgba(15,27,45,.28);
+  --head:'Inter Tight',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light;
+  /* break out of the theme's content column */
+  width:100vw; position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw;
+  background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.65;
+  overflow-x:clip; -webkit-font-smoothing:antialiased; text-align:left;
+}
+#vinaura-lp *,#vinaura-lp *::before,#vinaura-lp *::after{box-sizing:border-box}
+#vinaura-lp h1,#vinaura-lp h2,#vinaura-lp h3,#vinaura-lp h4,#vinaura-lp p,#vinaura-lp ul,#vinaura-lp ol,#vinaura-lp figure,#vinaura-lp dl,#vinaura-lp dd{margin:0;padding:0}
+#vinaura-lp ul,#vinaura-lp ol{list-style:none}
+#vinaura-lp h1,#vinaura-lp h2,#vinaura-lp h3,#vinaura-lp h4{font-family:var(--head);color:var(--ink);letter-spacing:-.02em;line-height:1.15;text-transform:none;font-weight:700}
+#vinaura-lp a{color:var(--brand);text-decoration:none;box-shadow:none}
+#vinaura-lp a:hover{color:var(--brand-ink)}
+#vinaura-lp img{max-width:100%;height:auto;display:block;border:0;margin:0;box-shadow:none}
+#vinaura-lp button,#vinaura-lp input,#vinaura-lp select,#vinaura-lp textarea{font:inherit;color:inherit;letter-spacing:normal;text-transform:none}
+#vinaura-lp :focus-visible{outline:3px solid rgba(31,95,214,.45);outline-offset:2px}
+
+#vinaura-lp .va-wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+#vinaura-lp section{padding:96px 0;position:relative}
+#vinaura-lp .va-eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 13px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+#vinaura-lp .va-eyebrow::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
+#vinaura-lp .va-h2{font-size:clamp(30px,4vw,44px);margin-top:14px}
+#vinaura-lp .va-lead{font-size:clamp(17px,1.6vw,19px);color:var(--ink-2);margin-top:16px;max-width:680px}
+#vinaura-lp .va-head{max-width:760px;margin-bottom:52px}
+#vinaura-lp .va-head.va-center{margin-left:auto;margin-right:auto;text-align:center}
+#vinaura-lp .va-head.va-center .va-lead{margin-left:auto;margin-right:auto}
+
+/* buttons */
+#vinaura-lp .va-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:10px;font:600 16px/1.2 var(--body);border:1px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .2s ease,background .2s ease,color .2s ease;white-space:nowrap}
+#vinaura-lp .va-btn svg{width:18px;height:18px;flex:none}
+#vinaura-lp .va-btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 18px -6px rgba(31,95,214,.6)}
+#vinaura-lp .va-btn-primary:hover{background:var(--brand-ink);color:#fff;transform:translateY(-1px)}
+#vinaura-lp .va-btn-ghost{background:#fff;color:var(--ink);border-color:var(--line-2)}
+#vinaura-lp .va-btn-ghost:hover{border-color:var(--brand);color:var(--brand)}
+#vinaura-lp .va-btn-light{background:#fff;color:var(--brand-ink)}
+#vinaura-lp .va-btn-light:hover{background:var(--brand-soft);color:var(--brand-ink)}
+#vinaura-lp .va-btn-outline-light{background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
+#vinaura-lp .va-btn-outline-light:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,.08)}
+
+/* sub-navigation */
+#vinaura-lp .va-nav{position:sticky;top:16px;z-index:60;height:0;padding:0 16px}
+#vinaura-lp .va-navrow{max-width:1180px;margin:0 auto;display:flex;align-items:flex-start;gap:10px}
+#vinaura-lp .va-bar{flex:1;min-width:0;background:#fff;border-radius:10px;border:1px solid rgba(15,27,45,.07);box-shadow:0 1px 2px rgba(15,27,45,.04),0 12px 32px -16px rgba(15,27,45,.28);transition:box-shadow .3s ease}
+#vinaura-lp .va-bar.va-open,#vinaura-lp .va-nav.va-scrolled .va-bar{box-shadow:0 1px 2px rgba(15,27,45,.05),0 26px 60px -20px rgba(15,27,45,.38)}
+#vinaura-lp .va-bar-top{display:flex;align-items:center;height:68px;padding:0 12px 0 18px}
+#vinaura-lp .va-logo{display:flex;align-items:center;gap:10px;font:700 20px/1 var(--head);color:var(--ink);letter-spacing:-.02em;flex:none}
+#vinaura-lp .va-logo:hover{color:var(--ink)}
+#vinaura-lp .va-logo-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(140deg,#3b7cf0,#1a4fb8);display:grid;place-items:center;box-shadow:0 3px 8px -2px rgba(31,95,214,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+#vinaura-lp .va-logo-mark svg{width:17px;height:17px;color:#fff}
+#vinaura-lp .va-logo small{font:600 10px/1 var(--body);letter-spacing:.16em;color:var(--muted);margin-left:1px}
+#vinaura-lp .va-nav-links{display:flex;align-items:center;gap:2px;margin:0 auto;padding:0 16px}
+#vinaura-lp .va-nl{display:inline-flex;align-items:center;gap:7px;height:46px;padding:0 15px;border-radius:50px;border:0;background:none;color:var(--ink);font:500 17px/1 var(--body);cursor:pointer;white-space:nowrap;transition:background .2s ease,color .2s ease}
+#vinaura-lp .va-nl:hover,#vinaura-lp .va-nl.va-act{background:var(--soft-2);color:var(--ink)}
+#vinaura-lp .va-nl .va-chev{width:13px;height:13px;color:var(--muted);transition:transform .25s ease}
+#vinaura-lp .va-nl.va-act .va-chev{transform:rotate(180deg)}
+#vinaura-lp .va-burger{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--soft-2);cursor:pointer;display:grid;place-items:center;align-content:center;gap:6px;padding:0;margin-left:auto;transition:background .2s ease}
+#vinaura-lp .va-burger:hover{background:var(--brand-soft)}
+#vinaura-lp .va-burger i{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink);transition:transform .3s ease}
+#vinaura-lp .va-burger.va-x i:first-child{transform:translateY(4px) rotate(45deg)}
+#vinaura-lp .va-burger.va-x i:last-child{transform:translateY(-4px) rotate(-45deg)}
+#vinaura-lp .va-panels{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.2,.7,.2,1)}
+#vinaura-lp .va-bar.va-open .va-panels{grid-template-rows:1fr}
+#vinaura-lp .va-panels-in{overflow:hidden;min-height:0}
+#vinaura-lp .va-panel{display:none;padding:6px 16px 16px;opacity:0;transition:opacity .3s ease .05s}
+#vinaura-lp .va-panel.va-on{display:grid}
+#vinaura-lp .va-bar.va-open .va-panel.va-on{opacity:1}
+#vinaura-lp .va-panel[data-panel="modules"],#vinaura-lp .va-panel[data-panel="platform"]{grid-template-columns:270px 1fr;gap:32px}
+#vinaura-lp .va-pcard{position:relative;display:block;height:300px;border-radius:10px;overflow:hidden;background:#2e3a4b;color:#fff}
+#vinaura-lp .va-pcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;opacity:.75;transition:transform .6s ease,opacity .3s ease}
+#vinaura-lp .va-pcard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(46,58,75,0) 30%,rgba(22,30,43,.92))}
+#vinaura-lp .va-pcard:hover img{transform:scale(1.05);opacity:.85}
+#vinaura-lp .va-pcard-foot{position:absolute;left:18px;right:16px;bottom:16px;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#vinaura-lp .va-pcard-foot b{display:block;font:600 20px/1.2 var(--head);color:#fff}
+#vinaura-lp .va-pcard-foot small{display:block;font:500 13px/1.4 var(--body);color:#c3cedd;margin-top:4px}
+#vinaura-lp .va-arrow{flex:none;width:36px;height:36px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;transition:transform .3s ease}
+#vinaura-lp .va-arrow svg{width:17px;height:17px}
+#vinaura-lp .va-pcard:hover .va-arrow{transform:rotate(-45deg)}
+#vinaura-lp .va-plist{display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:2px 20px;padding-top:12px}
+#vinaura-lp .va-plist a{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;color:var(--ink);font:500 18px/1.3 var(--body);transition:background .2s ease,color .2s ease}
+#vinaura-lp .va-plist a::after{content:"";width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg) translateX(-4px);opacity:0;transition:opacity .2s ease,transform .2s ease}
+#vinaura-lp .va-plist a:hover{background:var(--soft);color:var(--brand)}
+#vinaura-lp .va-plist a:hover::after{opacity:1;transform:rotate(45deg) translateX(0)}
+#vinaura-lp .va-plist .va-pnote{grid-column:1/-1;margin:14px 12px 0;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+#vinaura-lp .va-panel[data-panel="all"]{grid-template-columns:repeat(3,1fr);gap:8px 24px}
+#vinaura-lp .va-pgroup h4{font:600 12px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 12px 8px}
+#vinaura-lp .va-pgroup .va-plist{grid-template-columns:1fr;padding-top:0}
+#vinaura-lp .va-quote{flex:none;display:flex;align-items:center;gap:16px;height:68px;padding:0 14px 0 22px;border-radius:10px;background:#fff;color:var(--ink);font:500 17px/1 var(--body);white-space:nowrap;
+  border:1px solid rgba(15,27,45,.07);box-shadow:0 1px 2px rgba(15,27,45,.04),0 12px 32px -16px rgba(15,27,45,.28);transition:box-shadow .3s ease}
+#vinaura-lp .va-quote:hover{color:var(--ink);box-shadow:0 1px 2px rgba(15,27,45,.05),0 20px 44px -16px rgba(31,95,214,.45)}
+#vinaura-lp .va-quote-ic{position:relative;width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;transition:background .25s ease,transform .3s ease}
+#vinaura-lp .va-quote-ic::before{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(31,95,214,.35);animation:vaRing 2.4s ease-out infinite}
+#vinaura-lp .va-quote-ic svg{width:18px;height:18px}
+#vinaura-lp .va-quote:hover .va-quote-ic{background:var(--brand-ink);transform:rotate(-45deg)}
+@keyframes vaRing{0%{transform:scale(.9);opacity:1}100%{transform:scale(1.35);opacity:0}}
+
+/* hero */
+#vinaura-lp .va-hero{padding:148px 0 0;overflow:hidden;background:
+  radial-gradient(1000px 560px at 50% -12%,rgba(31,95,214,.16),transparent 65%),
+  radial-gradient(620px 400px at 6% 42%,rgba(15,138,126,.09),transparent 60%),
+  radial-gradient(620px 400px at 94% 48%,rgba(122,91,154,.09),transparent 60%),
+  linear-gradient(#fff,#f5f8fd)}
+#vinaura-lp .va-hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:56px 56px;opacity:.5;-webkit-mask-image:radial-gradient(ellipse 60% 55% at 50% 20%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse 60% 55% at 50% 20%,#000 20%,transparent 75%)}
+#vinaura-lp .va-hero-copy{max-width:920px;margin:0 auto;text-align:center;position:relative}
+#vinaura-lp .va-pill{display:inline-flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;color:var(--ink-2);box-shadow:var(--shadow)}
+#vinaura-lp .va-pill b{background:var(--brand);color:#fff;border-radius:999px;padding:4px 10px;font-weight:600;font-size:11.5px;letter-spacing:.06em}
+#vinaura-lp .va-hero h1{font-size:clamp(38px,5.8vw,70px);line-height:1.04;margin-top:26px;font-weight:800;letter-spacing:-.042em}
+#vinaura-lp .va-hero h1 em{font-style:normal;color:var(--brand)}
+@supports (-webkit-background-clip:text) or (background-clip:text){
+  #vinaura-lp .va-hero h1 em{background:linear-gradient(95deg,#1f5fd6 10%,#2a6fe6 45%,#0f8a7e 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+}
+#vinaura-lp .va-hero .va-lead{font-size:clamp(17px,1.6vw,20px);margin:24px auto 0;max-width:740px}
+#vinaura-lp .va-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+#vinaura-lp .va-hero .va-cta{justify-content:center;margin-top:34px}
+#vinaura-lp .va-hero .va-btn{padding:16px 28px;font-size:16.5px}
+#vinaura-lp .va-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:30px}
+#vinaura-lp .va-chips li{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.8);border:1px solid var(--line);font-size:14px;font-weight:500;color:var(--ink-2)}
+#vinaura-lp .va-chips li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c,var(--brand))}
+
+#vinaura-lp .va-stage{position:relative;max-width:1120px;margin:64px auto 0;perspective:2200px;isolation:isolate}
+#vinaura-lp .va-stage::after{content:"";position:absolute;left:-20%;right:-20%;bottom:-1px;height:38%;background:linear-gradient(rgba(255,255,255,0),#fff 92%);z-index:2;pointer-events:none}
+#vinaura-lp .va-glow{position:absolute;left:8%;right:8%;top:6%;height:70%;background:radial-gradient(closest-side,rgba(31,95,214,.35),rgba(15,138,126,.12) 60%,transparent);filter:blur(50px);z-index:-1}
+#vinaura-lp .va-browser{border-radius:14px;background:#fff;border:1px solid var(--line-2);box-shadow:var(--shadow-lg);overflow:hidden}
+#vinaura-lp .va-browser-bar{display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;background:var(--soft);border-bottom:1px solid var(--line)}
+#vinaura-lp .va-browser-bar i{width:10px;height:10px;border-radius:50%;background:#d8dee8}
+#vinaura-lp .va-browser-bar i:nth-child(1){background:#f1a5a0}#vinaura-lp .va-browser-bar i:nth-child(2){background:#f3d08b}#vinaura-lp .va-browser-bar i:nth-child(3){background:#a9d7a3}
+#vinaura-lp .va-browser-bar span{margin:0 auto;width:min(360px,60%);height:22px;border-radius:6px;background:#fff;border:1px solid var(--line);font:500 11.5px/20px var(--body);color:var(--muted);text-align:center;overflow:hidden;white-space:nowrap}
+#vinaura-lp .va-stage .va-browser{transform:rotateX(14deg) scale(.95);transform-origin:50% 0;transition:transform 1.3s cubic-bezier(.2,.7,.2,1)}
+#vinaura-lp .va-stage.va-seen .va-browser,#vinaura-lp:not(.va-js) .va-stage .va-browser{transform:none}
+#vinaura-lp .va-fc{position:absolute;z-index:3;display:flex;align-items:center;gap:12px;padding:12px 16px 12px 12px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -14px rgba(15,27,45,.28);font-size:13px;color:var(--muted);line-height:1.35;animation:vaBob 6s ease-in-out infinite}
+#vinaura-lp .va-fc b{display:block;font:700 14.5px/1.3 var(--head);color:var(--ink)}
+#vinaura-lp .va-fc .va-dot{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none;background:var(--c)}
+#vinaura-lp .va-fc .va-dot svg{width:19px;height:19px}
+#vinaura-lp .va-fc-1{left:-4%;top:16%}
+#vinaura-lp .va-fc-2{right:-4%;top:9%;animation-delay:-1.5s}
+#vinaura-lp .va-fc-3{left:-1%;top:52%;animation-delay:-3s}
+#vinaura-lp .va-fc-4{right:-2%;top:45%;animation-delay:-4.5s}
+@keyframes vaBob{50%{transform:translateY(-9px)}}
+
+/* trusted by */
+#vinaura-lp .va-trust{padding:36px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff}
+#vinaura-lp .va-trust .va-wrap{display:flex;align-items:center;gap:36px;flex-wrap:wrap}
+#vinaura-lp .va-trust p{font-size:14px;color:var(--muted);max-width:220px;line-height:1.45}
+#vinaura-lp .va-trust ul{display:flex;flex-wrap:wrap;gap:14px 40px;flex:1;align-items:center}
+#vinaura-lp .va-trust li{display:flex;align-items:center;gap:10px;font:700 18px/1.2 var(--head);color:var(--slate);letter-spacing:-.01em}
+#vinaura-lp .va-trust li svg{width:22px;height:22px;color:var(--rose);flex:none}
+#vinaura-lp .va-trust li.va-more{font:500 15px/1.2 var(--body);color:var(--muted)}
+#vinaura-lp .va-trust li small{display:block;font:500 12px/1.2 var(--body);color:var(--muted);letter-spacing:.02em}
+
+/* story + timeline */
+#vinaura-lp .va-story{background:var(--soft)}
+#vinaura-lp .va-timeline{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:8px}
+#vinaura-lp .va-timeline::before{content:"";position:absolute;left:0;right:0;top:27px;height:2px;background:linear-gradient(90deg,var(--line-2),var(--brand) 92%)}
+#vinaura-lp .va-step{position:relative;padding-top:64px}
+#vinaura-lp .va-step::before{content:"";position:absolute;top:18px;left:0;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--line-2)}
+#vinaura-lp .va-step.va-now::before{border-color:var(--brand);background:var(--brand);box-shadow:0 0 0 6px rgba(31,95,214,.18)}
+#vinaura-lp .va-step .va-when{font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#vinaura-lp .va-step h3{font-size:19px;margin-top:8px}
+#vinaura-lp .va-step p{font-size:14.5px;color:var(--ink-2);margin-top:8px;line-height:1.55}
+#vinaura-lp .va-step.va-now h3{color:var(--brand)}
+#vinaura-lp .va-story-note{margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+#vinaura-lp .va-quote{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+#vinaura-lp .va-quote h3{font-size:18px}
+#vinaura-lp .va-quote p{font-size:15px;color:var(--ink-2);margin-top:8px}
+
+/* modules */
+#vinaura-lp .va-modules{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+#vinaura-lp .va-mod{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+#vinaura-lp .va-mod:hover{border-color:var(--line-2);box-shadow:var(--shadow);transform:translateY(-2px)}
+#vinaura-lp .va-ico{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;color:#fff;background:var(--c,var(--brand));
+  background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.07) 0 6px,transparent 6px 12px)}
+#vinaura-lp .va-ico svg{width:22px;height:22px}
+#vinaura-lp .va-mod h3{font-size:19px;margin-top:18px}
+#vinaura-lp .va-mod p{font-size:15px;color:var(--ink-2);margin-top:8px;line-height:1.6}
+#vinaura-lp .va-mod ul{margin-top:14px;display:grid;gap:6px}
+#vinaura-lp .va-mod li{font-size:14px;color:var(--muted);padding-left:20px;position:relative;line-height:1.5}
+#vinaura-lp .va-mod li::before{content:"";position:absolute;left:2px;top:8px;width:8px;height:8px;border-radius:2px;background:var(--c,var(--brand));opacity:.55}
+
+/* technology */
+#vinaura-lp .va-tech{background:var(--slate);color:#dbe3ee;overflow:hidden}
+#vinaura-lp .va-tech::before{content:"";position:absolute;inset:0;background:radial-gradient(700px 400px at 90% 0%,rgba(31,95,214,.35),transparent 60%),radial-gradient(600px 400px at 0% 100%,rgba(15,138,126,.22),transparent 60%);pointer-events:none}
+#vinaura-lp .va-tech .va-wrap{position:relative}
+#vinaura-lp .va-tech .va-eyebrow{color:#8fb4ff}
+#vinaura-lp .va-tech .va-h2,#vinaura-lp .va-tech h3{color:#fff}
+#vinaura-lp .va-tech .va-lead{color:#c3cedd}
+#vinaura-lp .va-stack{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:start}
+#vinaura-lp .va-layers{display:grid;gap:10px}
+#vinaura-lp .va-layer{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+#vinaura-lp .va-layer b{display:block;color:#fff;font:700 17px/1.3 var(--head)}
+#vinaura-lp .va-layer span{font-size:14px;color:#b5c2d3}
+#vinaura-lp .va-layer .va-num{width:34px;height:34px;flex:none;border-radius:9px;display:grid;place-items:center;background:rgba(143,180,255,.16);color:#a9c5ff;font:700 14px/1 var(--head)}
+#vinaura-lp .va-layer.va-core{background:rgba(31,95,214,.28);border-color:rgba(143,180,255,.45)}
+#vinaura-lp .va-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#vinaura-lp .va-stat{padding:22px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+#vinaura-lp .va-stat strong{display:block;font:800 clamp(28px,3vw,36px)/1 var(--head);color:#fff;letter-spacing:-.02em}
+#vinaura-lp .va-stat span{display:block;margin-top:8px;font-size:14px;color:#b5c2d3;line-height:1.45}
+#vinaura-lp .va-tech-list{margin-top:36px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;border-top:1px solid rgba(255,255,255,.12);padding-top:32px}
+#vinaura-lp .va-tech-list h4{color:#fff;font-size:16px}
+#vinaura-lp .va-tech-list p{font-size:14px;color:#b5c2d3;margin-top:6px;line-height:1.55}
+
+/* security */
+#vinaura-lp .va-sec{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:start}
+#vinaura-lp .va-sec-card{position:sticky;top:96px;border-radius:18px;padding:32px;background:linear-gradient(160deg,#f3f7ff,#fff 60%);border:1px solid var(--line);box-shadow:var(--shadow)}
+#vinaura-lp .va-shield{width:64px;height:64px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px -10px rgba(31,95,214,.7)}
+#vinaura-lp .va-shield svg{width:30px;height:30px}
+#vinaura-lp .va-sec-card h3{font-size:22px;margin-top:20px}
+#vinaura-lp .va-sec-card p{color:var(--ink-2);font-size:15.5px;margin-top:10px}
+#vinaura-lp .va-roles{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+#vinaura-lp .va-roles span{font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line-2);color:var(--ink-2)}
+#vinaura-lp .va-checks{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#vinaura-lp .va-check{padding:22px;border-radius:var(--radius);border:1px solid var(--line);background:#fff}
+#vinaura-lp .va-check h4{display:flex;gap:10px;align-items:flex-start;font-size:16.5px;line-height:1.35}
+#vinaura-lp .va-check h4 svg{width:20px;height:20px;flex:none;color:var(--teal);margin-top:1px}
+#vinaura-lp .va-check p{font-size:14.5px;color:var(--ink-2);margin-top:8px;padding-left:30px;line-height:1.55}
+
+/* migration proof */
+#vinaura-lp .va-proof{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+#vinaura-lp .va-proof div{border-top:3px solid var(--c,var(--brand));padding-top:18px}
+#vinaura-lp .va-proof strong{display:block;font:800 clamp(30px,3.4vw,40px)/1 var(--head);letter-spacing:-.03em;color:var(--ink)}
+#vinaura-lp .va-proof h4{font-size:16px;margin-top:12px}
+#vinaura-lp .va-proof p{font-size:14.5px;color:var(--ink-2);margin-top:6px;line-height:1.55}
+
+/* guide */
+#vinaura-lp .va-guide{padding:0 0 96px}
+#vinaura-lp .va-guide-box{border-radius:22px;padding:56px;background:linear-gradient(120deg,var(--brand) 0%,#2a6fe6 45%,#0f8a7e 130%);color:#e7efff;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;position:relative;overflow:hidden}
+#vinaura-lp .va-guide-box::after{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;border:40px solid rgba(255,255,255,.07)}
+#vinaura-lp .va-guide-box h2{color:#fff;font-size:clamp(28px,3.4vw,38px)}
+#vinaura-lp .va-guide-box p{margin-top:14px;font-size:17px;color:#dce7ff;max-width:560px}
+#vinaura-lp .va-guide-box .va-cta{margin-top:26px;position:relative;z-index:1}
+#vinaura-lp .va-chapters{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:relative;z-index:1}
+#vinaura-lp .va-chapters span{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:14px;color:#fff}
+#vinaura-lp .va-chapters svg{width:15px;height:15px;opacity:.8;flex:none}
+
+/* faq */
+#vinaura-lp .va-faq{background:var(--soft)}
+#vinaura-lp .va-faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
+#vinaura-lp details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;transition:border-color .2s ease}
+#vinaura-lp details[open]{border-color:var(--line-2);box-shadow:var(--shadow)}
+#vinaura-lp summary{list-style:none;cursor:pointer;padding:20px 56px 20px 22px;font:600 16.5px/1.4 var(--head);color:var(--ink);position:relative}
+#vinaura-lp summary::-webkit-details-marker{display:none}
+#vinaura-lp summary::after{content:"";position:absolute;right:22px;top:50%;width:10px;height:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-70%) rotate(45deg);transition:transform .2s ease}
+#vinaura-lp details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+#vinaura-lp details p{padding:0 22px 20px;font-size:15.5px;color:var(--ink-2)}
+
+/* form */
+#vinaura-lp .va-get{background:linear-gradient(#fff,#f5f8fd)}
+#vinaura-lp .va-get-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start}
+#vinaura-lp .va-steps{margin-top:32px;display:grid;gap:18px;counter-reset:vastep}
+#vinaura-lp .va-steps li{display:flex;gap:14px;counter-increment:vastep;font-size:15.5px;color:var(--ink-2)}
+#vinaura-lp .va-steps li::before{content:counter(vastep);flex:none;width:30px;height:30px;border-radius:50%;background:var(--brand-soft);color:var(--brand-ink);font:700 14px/30px var(--head);text-align:center}
+#vinaura-lp .va-steps b{color:var(--ink);display:block}
+#vinaura-lp .va-form{background:#fff;border:1px solid var(--line);border-radius:18px;padding:34px;box-shadow:var(--shadow-lg)}
+#vinaura-lp .va-form h3{font-size:22px}
+#vinaura-lp .va-form > p{font-size:14.5px;color:var(--muted);margin-top:6px}
+#vinaura-lp .va-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;margin-top:24px}
+#vinaura-lp .va-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+#vinaura-lp .va-field.va-full{grid-column:1/-1}
+#vinaura-lp .va-field label{font-size:14px;font-weight:600;color:var(--ink);margin:0}
+#vinaura-lp .va-field label i{font-style:normal;color:var(--rose)}
+#vinaura-lp .va-field input,#vinaura-lp .va-field select,#vinaura-lp .va-field textarea{width:100%;max-width:100%;margin:0;padding:12px 14px;border:1px solid var(--line-2);border-radius:10px;background:#fff;font-size:15.5px;line-height:1.4;color:var(--ink);box-shadow:none;transition:border-color .15s ease,box-shadow .15s ease;height:auto;min-height:0}
+#vinaura-lp .va-field select{appearance:none;-webkit-appearance:none;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23627089'%3E%3Cpath d='M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px}
+#vinaura-lp .va-field textarea{min-height:110px;resize:vertical}
+#vinaura-lp .va-field input:focus,#vinaura-lp .va-field select:focus,#vinaura-lp .va-field textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(31,95,214,.14)}
+#vinaura-lp .va-field.va-bad input,#vinaura-lp .va-field.va-bad select{border-color:var(--rose)}
+#vinaura-lp .va-err{font-size:13px;color:var(--rose);min-height:0}
+#vinaura-lp .va-hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
+#vinaura-lp .va-form-foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:24px}
+#vinaura-lp .va-form-foot small{font-size:13px;color:var(--muted);flex:1;min-width:200px;line-height:1.5}
+#vinaura-lp .va-btn[disabled]{opacity:.7;cursor:progress;transform:none}
+#vinaura-lp .va-spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;animation:vaSpin .8s linear infinite;display:none}
+#vinaura-lp .va-busy .va-spin{display:inline-block}
+@keyframes vaSpin{to{transform:rotate(360deg)}}
+#vinaura-lp .va-msg{display:none;margin-top:18px;padding:14px 16px;border-radius:10px;font-size:15px}
+#vinaura-lp .va-msg.va-err-box{display:block;background:#fdf0f1;color:#8f2d3c;border:1px solid #f3cdd3}
+#vinaura-lp .va-done{display:none;text-align:center;padding:30px 10px}
+#vinaura-lp .va-done .va-shield{margin:0 auto;background:var(--teal);box-shadow:0 10px 24px -10px rgba(15,138,126,.7)}
+#vinaura-lp .va-done h3{margin-top:18px;font-size:24px}
+#vinaura-lp .va-done p{margin-top:8px;color:var(--ink-2)}
+#vinaura-lp .va-form.va-sent .va-done{display:block}
+#vinaura-lp .va-form.va-sent form,#vinaura-lp .va-form.va-sent > h3,#vinaura-lp .va-form.va-sent > p{display:none}
+
+/* footer */
+#vinaura-lp .va-foot{padding:36px 0;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+#vinaura-lp .va-foot .va-wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+#vinaura-lp .va-foot nav{display:flex;gap:22px;flex-wrap:wrap}
+#vinaura-lp .va-foot a{color:var(--ink-2)}
+
+
+/* reveal */
+#vinaura-lp.va-js .va-reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+#vinaura-lp.va-js .va-reveal.va-seen{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  #vinaura-lp *{animation:none!important;transition:none!important}
+  #vinaura-lp.va-js .va-reveal{opacity:1;transform:none}
+  #vinaura-lp .va-stage .va-browser{transform:none}
+  #vinaura-lp .va-fc{animation:none}
+}
+
+/* responsive */
+@media (max-width:1080px){
+  #vinaura-lp .va-timeline{grid-template-columns:repeat(3,1fr);row-gap:8px}
+  #vinaura-lp .va-timeline::before{display:none}
+  #vinaura-lp .va-step{padding-top:44px}
+  #vinaura-lp .va-step::before{top:6px}
+  #vinaura-lp .va-modules{grid-template-columns:1fr 1fr}
+  #vinaura-lp .va-tech-list{grid-template-columns:1fr 1fr}
+  #vinaura-lp .va-proof{grid-template-columns:1fr 1fr;row-gap:36px}
+}
+@media (max-width:900px){
+  #vinaura-lp section{padding:72px 0}
+  #vinaura-lp .va-nav-links{display:none}
+  #vinaura-lp .va-panel[data-panel="all"]{grid-template-columns:1fr;max-height:calc(100vh - 120px);overflow:auto}
+  #vinaura-lp .va-plist a{font-size:17px}
+  #vinaura-lp .va-stack,#vinaura-lp .va-sec,#vinaura-lp .va-fr-grid,#vinaura-lp .va-faq-grid,#vinaura-lp .va-get-grid,#vinaura-lp .va-guide-box{grid-template-columns:1fr}
+  #vinaura-lp .va-fc-3,#vinaura-lp .va-fc-4{display:none}
+  #vinaura-lp .va-fc-1{left:8px;top:auto;bottom:30%}
+  #vinaura-lp .va-fc-2{right:8px;top:-18px}
+  #vinaura-lp .va-sec-card{position:static}
+  #vinaura-lp .va-story-note,  #vinaura-lp .va-guide-box{padding:40px 28px}
+  #vinaura-lp .va-guide{padding-bottom:72px}
+}
+@media (max-width:640px){
+  #vinaura-lp{font-size:16px}
+  #vinaura-lp .va-wrap{padding:0 16px}
+  #vinaura-lp .va-hero{padding:112px 0 0}
+  #vinaura-lp .va-cta .va-btn{flex:1 1 100%}
+  #vinaura-lp .va-fc{display:none}
+  #vinaura-lp .va-stage{margin-top:40px}
+  #vinaura-lp .va-chips{margin-top:24px}
+  #vinaura-lp .va-chips li{font-size:13px;padding:6px 12px}
+  #vinaura-lp .va-timeline,#vinaura-lp .va-modules,#vinaura-lp .va-checks,#vinaura-lp .va-tech-list,#vinaura-lp .va-proof,#vinaura-lp .va-chapters,#vinaura-lp .va-fields,#vinaura-lp .va-stats{grid-template-columns:1fr}
+  #vinaura-lp .va-timeline{border-left:2px solid var(--line-2);margin-left:9px;padding-left:22px;gap:0}
+  #vinaura-lp .va-step{padding:0 0 26px}
+  #vinaura-lp .va-step::before{left:-34px;top:0}
+  #vinaura-lp .va-trust .va-wrap{gap:18px}
+  #vinaura-lp .va-trust ul{gap:14px 26px}
+  #vinaura-lp .va-form{padding:24px 18px}
+  #vinaura-lp .va-compare{aspect-ratio:1.25}
+  #vinaura-lp .va-cmp-frame{padding:7px;border-radius:18px}
+  #vinaura-lp .va-cmp-win{border-radius:12px}
+  #vinaura-lp .va-cmp-bar{height:32px;padding:0 12px}
+  #vinaura-lp .va-cmp-bar i{width:9px;height:9px}
+  #vinaura-lp .va-cmp-bar span{font-size:12px;padding-right:30px}
+  #vinaura-lp .va-seg button{padding:9px 13px;font-size:14px;gap:6px}
+  #vinaura-lp .va-compare .va-handle button{width:46px;height:46px}
+  #vinaura-lp .va-nav{padding:0 12px}
+  #vinaura-lp .va-nav{top:10px;padding:0 10px}
+  #vinaura-lp .va-navrow{gap:8px}
+  #vinaura-lp .va-bar-top{height:60px;padding:0 8px 0 14px}
+  #vinaura-lp .va-logo{font-size:18px}
+  #vinaura-lp .va-logo small{display:none}
+  #vinaura-lp .va-quote{height:60px;padding:0 10px;gap:0}
+  #vinaura-lp .va-quote-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  #vinaura-lp .va-burger{width:42px;height:42px}
+  #vinaura-lp .va-nav .va-btn-cta svg{display:none}
+}
+
+/* ================= v3 theme: calm slabs, big type, scroll effects ================= */
+#vinaura-lp{
+  --paper:#f5f3ee; --sand:#ebe6dc; --ink:#1c2230; --ink-2:#3e4757; --muted:#6b7385;
+  --line:#e4dfd4; --line-2:#d5cfc2; --soft:#f5f3ee; --soft-2:#ece8df;
+}
+#vinaura-lp h1,#vinaura-lp h2,#vinaura-lp h3,#vinaura-lp h4{font-weight:600;letter-spacing:-.03em}
+#vinaura-lp .va-h2{font-size:clamp(34px,5.2vw,64px);line-height:1.02;letter-spacing:-.045em}
+#vinaura-lp .va-lead{font-size:clamp(17px,1.5vw,20px);line-height:1.6}
+#vinaura-lp .va-hero h1{font-size:clamp(42px,7.2vw,100px);line-height:.98;letter-spacing:-.055em;font-weight:600}
+#vinaura-lp .va-eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 15px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink);font:500 14px/1 var(--body);letter-spacing:0;text-transform:none}
+#vinaura-lp .va-eyebrow::before{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+#vinaura-lp .va-tech .va-eyebrow{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#fff}
+#vinaura-lp .va-tech .va-eyebrow::before{background:#8fb4ff}
+#vinaura-lp .va-hero{background:radial-gradient(1000px 560px at 50% -12%,rgba(31,95,214,.13),transparent 65%),linear-gradient(#fff,#fff)}
+#vinaura-lp .va-hero::before{opacity:.35}
+#vinaura-lp .va-stage::after{background:linear-gradient(rgba(255,255,255,0),#fff 92%)}
+
+/* slabs */
+#vinaura-lp .va-slab{margin:0 12px 12px;border-radius:40px;transform-origin:50% 0}
+#vinaura-lp.va-js .va-slab{transform:scale(.97);transition:transform 1.1s cubic-bezier(.2,.7,.2,1)}
+#vinaura-lp.va-js .va-slab.va-in{transform:none}
+#vinaura-lp .va-bg-paper{background:var(--paper)}
+#vinaura-lp .va-bg-sand{background:var(--sand)}
+#vinaura-lp .va-bg-blue{background:var(--brand);color:#fff}
+#vinaura-lp section.va-slab{padding:110px 0}
+#vinaura-lp .va-tech.va-slab{background:var(--slate)}
+#vinaura-lp .va-trust{border:0;padding:44px 0 56px}
+#vinaura-lp .va-faq{background:#fff}
+#vinaura-lp .va-get{background:var(--paper)}
+#vinaura-lp .va-quote,#vinaura-lp .va-bar{border-color:rgba(28,34,48,.08)}
+
+/* module index */
+#vinaura-lp .va-mods{padding-bottom:40px}
+#vinaura-lp .va-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+#vinaura-lp .va-tile{position:relative;display:flex;flex-direction:column;gap:8px;min-height:212px;padding:22px 22px 58px;border-radius:22px;background:#fff;border:1px solid var(--line);color:var(--ink);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease,border-color .35s ease}
+#vinaura-lp .va-tile:hover{color:var(--ink);transform:translateY(-4px);border-color:transparent;box-shadow:0 22px 44px -22px rgba(28,34,48,.35)}
+#vinaura-lp .va-tile-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#vinaura-lp .va-tile .va-ico{width:42px;height:42px;border-radius:12px}
+#vinaura-lp .va-tile .va-ico svg{width:20px;height:20px}
+#vinaura-lp .va-tile-no{font:600 13px/1 var(--head);color:var(--muted);letter-spacing:.02em}
+#vinaura-lp .va-tile b{font:600 19px/1.2 var(--head);letter-spacing:-.02em}
+#vinaura-lp .va-tile-t{font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+#vinaura-lp .va-tile .va-arrow{position:absolute;right:16px;bottom:16px;width:34px;height:34px;background:var(--paper);color:var(--ink);transition:transform .35s ease,background .35s ease,color .35s ease}
+#vinaura-lp .va-tile:hover .va-arrow{background:var(--c);color:#fff;transform:rotate(-45deg)}
+
+/* module chapters */
+#vinaura-lp .va-chap{padding:96px 0 40px;scroll-margin-top:84px}
+#vinaura-lp .va-chap + .va-chap{border-top:1px solid var(--line);margin:0 24px;padding-left:0;padding-right:0}
+#vinaura-lp .va-chap:first-of-type{margin-top:40px}
+#vinaura-lp .va-chap-grid{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.25fr);gap:64px;align-items:start}
+#vinaura-lp .va-chap-head{position:sticky;top:112px}
+#vinaura-lp .va-chap-no{display:inline-flex;align-items:center;gap:12px;font:600 15px/1 var(--head);color:var(--ink)}
+#vinaura-lp .va-chap-no i{font-style:normal;color:var(--muted);font-weight:500}
+#vinaura-lp .va-chap-no .va-ico{width:44px;height:44px;border-radius:12px}
+#vinaura-lp .va-chap-no .va-ico svg{width:21px;height:21px}
+#vinaura-lp .va-chap-head h3{font-size:clamp(32px,3.8vw,50px);line-height:1.02;letter-spacing:-.045em;margin-top:22px}
+#vinaura-lp .va-chap-head > p{font-size:18px;line-height:1.6;color:var(--ink-2);margin-top:16px}
+#vinaura-lp .va-chap-head .va-chap-menu{margin-top:26px;padding:16px 18px;border-radius:16px;background:#fff;border:1px solid var(--line);font-size:14px;line-height:1.6;color:var(--ink-2)}
+#vinaura-lp .va-chap-menu b{display:block;font:600 11.5px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+#vinaura-lp .va-chap-cards{display:grid;gap:12px}
+#vinaura-lp .va-fcard{position:relative;background:#fff;border-radius:22px;padding:28px 30px 28px 34px;border:1px solid var(--line);transition:box-shadow .35s ease,transform .35s ease}
+#vinaura-lp .va-fcard::before{content:"";position:absolute;left:0;top:28px;width:4px;height:26px;border-radius:0 4px 4px 0;background:var(--c)}
+#vinaura-lp .va-fcard:hover{box-shadow:0 20px 40px -24px rgba(28,34,48,.3);transform:translateY(-2px)}
+#vinaura-lp .va-fcard h4{font-size:21px;line-height:1.25;letter-spacing:-.025em}
+#vinaura-lp .va-fcard p{font-size:16px;line-height:1.65;color:var(--ink-2);margin-top:8px}
+#vinaura-lp .va-fcard p b{color:var(--ink);font-weight:600}
+
+/* stacking number cards */
+#vinaura-lp .va-nums-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:64px;align-items:start}
+#vinaura-lp .va-nums-head{position:sticky;top:130px}
+#vinaura-lp .va-num-list{display:grid;gap:0}
+#vinaura-lp .va-stk{position:sticky;top:calc(118px + var(--i) * 18px);display:flex;flex-direction:column;justify-content:space-between;gap:40px;min-height:300px;margin-bottom:22vh;padding:34px 36px;border-radius:28px;background:#fff;border:1px solid var(--line);box-shadow:0 -10px 30px -18px rgba(28,34,48,.25)}
+#vinaura-lp .va-stk:last-child{margin-bottom:0}
+#vinaura-lp .va-stk strong{font:600 clamp(60px,8vw,112px)/.9 var(--head);letter-spacing:-.06em;color:var(--ink)}
+#vinaura-lp .va-stk:nth-child(2n) strong{color:var(--brand)}
+#vinaura-lp .va-stk h4{font-size:21px;letter-spacing:-.02em}
+#vinaura-lp .va-stk p{font-size:16px;color:var(--ink-2);margin-top:6px;max-width:440px}
+
+/* call-out */
+#vinaura-lp .va-callout{padding:140px 0 120px;background:var(--brand);overflow:hidden}
+#vinaura-lp .va-callout::before{content:"";position:absolute;right:-160px;top:-160px;width:520px;height:520px;border-radius:50%;border:70px solid rgba(255,255,255,.06);pointer-events:none}
+#vinaura-lp .va-words{font:600 clamp(40px,6.6vw,96px)/1.02 var(--head);letter-spacing:-.05em;color:#fff;max-width:1100px}
+#vinaura-lp .va-words span{opacity:.22;transition:opacity .35s ease}
+#vinaura-lp .va-words span.va-lit{opacity:1}
+#vinaura-lp .va-callout-foot{display:flex;align-items:center;gap:28px 40px;flex-wrap:wrap;margin-top:56px}
+#vinaura-lp .va-callout-foot ul{display:flex;flex-wrap:wrap;gap:10px 26px}
+#vinaura-lp .va-callout-foot li{display:flex;align-items:center;gap:9px;color:#dce7ff;font-size:16px}
+#vinaura-lp .va-callout-foot li svg{width:18px;height:18px;color:#fff}
+#vinaura-lp .va-qbtn{display:inline-flex;align-items:center;gap:18px;height:66px;padding:0 13px 0 26px;border-radius:12px;background:#fff;color:var(--ink);font:500 18px/1 var(--body);box-shadow:0 18px 40px -18px rgba(10,20,40,.55);transition:transform .3s ease}
+#vinaura-lp .va-qbtn:hover{color:var(--ink);transform:translateY(-2px)}
+#vinaura-lp .va-qbtn:hover .va-quote-ic{transform:rotate(-45deg);background:var(--brand-ink)}
+
+/* footer */
+#vinaura-lp .va-foot{background:var(--slate);color:#b9c4d3;border:0;padding:72px 0 28px;margin-bottom:12px;overflow:hidden}
+#vinaura-lp .va-foot .va-wrap{display:block}
+#vinaura-lp .va-foot-top{display:flex;justify-content:space-between;gap:28px 48px;flex-wrap:wrap}
+#vinaura-lp .va-foot-top p{max-width:440px;font-size:17px;line-height:1.6;color:#d6dde7}
+#vinaura-lp .va-foot nav{display:flex;flex-wrap:wrap;gap:12px 26px;align-content:flex-start}
+#vinaura-lp .va-foot a{color:#fff}
+#vinaura-lp .va-foot a:hover{color:#8fb4ff}
+#vinaura-lp .va-foot-mark{font:600 clamp(80px,19vw,260px)/.8 var(--head);letter-spacing:-.06em;color:rgba(255,255,255,.08);margin:56px 0 24px;white-space:nowrap;overflow:hidden}
+#vinaura-lp .va-foot-mark span{display:inline-block;padding-right:.06em}
+#vinaura-lp .va-foot-bot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px;border-top:1px solid rgba(255,255,255,.1);padding-top:22px}
+
+@media (max-width:1080px){
+  #vinaura-lp .va-tiles{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:900px){
+  #vinaura-lp section.va-slab{padding:80px 0}
+  #vinaura-lp .va-tiles{grid-template-columns:1fr 1fr}
+  #vinaura-lp .va-chap-grid,#vinaura-lp .va-nums-grid{grid-template-columns:1fr;gap:28px}
+  #vinaura-lp .va-chap-head,#vinaura-lp .va-nums-head{position:static}
+  #vinaura-lp .va-chap{padding:64px 0 24px}
+  #vinaura-lp .va-stk{top:calc(96px + var(--i) * 12px);min-height:240px;margin-bottom:16vh}
+}
+@media (max-width:640px){
+  #vinaura-lp .va-slab{margin:0 6px 8px;border-radius:26px}
+  #vinaura-lp section.va-slab{padding:64px 0}
+  #vinaura-lp .va-tiles{grid-template-columns:1fr}
+  #vinaura-lp .va-tile{min-height:0}
+  #vinaura-lp .va-chap + .va-chap{margin:0 16px}
+  #vinaura-lp .va-fcard{padding:22px 22px 22px 26px}
+  #vinaura-lp .va-fcard::before{top:24px}
+  #vinaura-lp .va-stk{padding:26px;gap:24px}
+  #vinaura-lp .va-callout{padding:84px 0 72px}
+  #vinaura-lp .va-qbtn{width:100%;justify-content:space-between}
+}
+@media (prefers-reduced-motion:reduce){
+  #vinaura-lp.va-js .va-slab{transform:none}
+  #vinaura-lp .va-words span{opacity:1}
+}
+
+/* hero: fawn on load, then brand blue */
+#vinaura-lp .va-hero{margin:0;border-radius:0;overflow:hidden;background:var(--sand);padding-bottom:0}
+#vinaura-lp .va-hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.3s ease;
+  -webkit-mask-image:none;mask-image:none;background-size:auto;
+  background:radial-gradient(900px 520px at 50% -8%,rgba(255,255,255,.2),transparent 62%),radial-gradient(700px 500px at 100% 100%,rgba(15,138,126,.45),transparent 65%),linear-gradient(160deg,#1a4fb8 0%,#1f5fd6 45%,#2a6fe6 100%)}
+#vinaura-lp .va-hero.va-lit::before{opacity:1}
+#vinaura-lp .va-hero-copy,#vinaura-lp .va-stage{z-index:1}
+#vinaura-lp .va-hero h1,#vinaura-lp .va-hero .va-lead{transition:color 1.3s ease}
+#vinaura-lp .va-hero.va-lit h1{color:#fff}
+#vinaura-lp .va-hero.va-lit h1 em{background:linear-gradient(95deg,#d4e4ff 10%,#a8f0e4 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+#vinaura-lp .va-hero.va-lit .va-lead{color:#dbe6ff}
+#vinaura-lp .va-hero .va-pill,#vinaura-lp .va-hero .va-chips li,#vinaura-lp .va-hero .va-btn{transition:background 1.3s ease,color 1.3s ease,border-color 1.3s ease,box-shadow 1.3s ease,transform .15s ease}
+#vinaura-lp .va-hero.va-lit .va-pill{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff;box-shadow:none}
+#vinaura-lp .va-hero.va-lit .va-pill b{background:#fff;color:var(--brand-ink)}
+#vinaura-lp .va-hero.va-lit .va-chips li{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:#eaf1ff}
+#vinaura-lp .va-hero.va-lit .va-chips li::before{box-shadow:0 0 0 2px rgba(255,255,255,.55)}
+#vinaura-lp .va-hero.va-lit .va-btn-primary{background:#fff;color:var(--brand-ink);box-shadow:0 12px 30px -10px rgba(8,20,50,.55)}
+#vinaura-lp .va-hero.va-lit .va-btn-primary:hover{background:#eef3ff;color:var(--brand-ink)}
+#vinaura-lp .va-hero.va-lit .va-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.45)}
+#vinaura-lp .va-hero.va-lit .va-btn-ghost:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,.12)}
+#vinaura-lp .va-stage::after{display:none}
+#vinaura-lp .va-stage .va-browser{-webkit-mask-image:linear-gradient(#000 55%,transparent 97%);mask-image:linear-gradient(#000 55%,transparent 97%)}
+#vinaura-lp .va-glow{transition:opacity 1.3s ease}
+#vinaura-lp .va-hero.va-lit .va-glow{background:radial-gradient(closest-side,rgba(255,255,255,.3),rgba(160,240,228,.12) 60%,transparent)}
+
+/* dropdown: items rise in one after another, like MindMarket */
+@keyframes vaItemIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes vaCardIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+#vinaura-lp .va-bar.va-open .va-panel.va-on .va-plist li,
+#vinaura-lp .va-bar.va-open .va-panel.va-on .va-pgroup h4{animation:vaItemIn .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(90ms + var(--d,0) * 35ms)}
+#vinaura-lp .va-bar.va-open .va-panel.va-on .va-pcard{animation:vaCardIn .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:40ms}
+#vinaura-lp .va-bar.va-open .va-panel.va-on .va-pcard img{animation:vaCardImg 1.1s cubic-bezier(.2,.7,.2,1) backwards}
+@keyframes vaCardImg{from{transform:scale(1.12)}to{transform:none}}
+
+/* showcase: two real screens that cross-fade */
+#vinaura-lp .va-show .va-seg button small{background:var(--soft-2);color:var(--muted)}
+#vinaura-lp .va-show-stage{position:relative;aspect-ratio:2400/1237;background:#eef2f7;overflow:hidden}
+#vinaura-lp .va-show-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;opacity:0;transform:scale(1.025);transition:opacity .9s ease,transform 1.4s cubic-bezier(.2,.7,.2,1)}
+#vinaura-lp .va-show-stage img.va-on{opacity:1;transform:none}
+#vinaura-lp .va-show-bar{height:3px;background:var(--line)}
+#vinaura-lp .va-show-bar i{display:block;height:100%;width:0;background:var(--brand)}
+#vinaura-lp .va-show.va-auto .va-show-bar i{animation:vaShowBar var(--dur,5.5s) linear forwards}
+@keyframes vaShowBar{from{width:0}to{width:100%}}
+#vinaura-lp .va-show-cap{max-width:640px;margin:18px auto 0;text-align:center;font-size:15.5px;line-height:1.55;color:var(--ink-2);transition:opacity .35s ease}
+#vinaura-lp .va-cmp-bar b{font-weight:500}
+
+/* showcase tabs: one row; scrolls sideways when it doesn't fit */
+#vinaura-lp .va-show .va-seg{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;gap:2px}
+#vinaura-lp .va-show .va-seg::-webkit-scrollbar{display:none}
+#vinaura-lp .va-show .va-seg button{flex:none;padding:10px 16px;font-size:14.5px}
+@media (max-width:640px){#vinaura-lp .va-show .va-seg{justify-content:flex-start;border-radius:16px}#vinaura-lp .va-show .va-seg button{padding:9px 13px;font-size:14px}}
+
+/* wide tile and "New" badge */
+#vinaura-lp .va-tile.va-tile-wide{grid-column:1/-1;min-height:0;padding-right:70px;background:linear-gradient(115deg,#fff 50%,color-mix(in srgb,var(--c) 11%,#fff))}
+#vinaura-lp .va-new{display:inline-flex;align-items:center;margin-left:10px;padding:4px 9px;border-radius:999px;background:var(--c,var(--brand));color:#fff;font:600 11px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;vertical-align:3px}
+#vinaura-lp .va-hero a.va-pill{text-decoration:none}
+#vinaura-lp .va-hero.va-lit a.va-pill:hover{background:rgba(255,255,255,.2);color:#fff}
+
+/* no browser-default gap around the page */
+body:has(#vinaura-lp){margin:0}
+/* keep theme rules (e.g. WordPress "constrained" layouts) from squeezing or shifting the page */
+#vinaura-lp,#vinaura-lp.alignfull{max-width:100vw!important;box-sizing:border-box!important;padding:0!important;float:none!important;
+  transform:none!important;border:0!important;background:var(--bg)!important}
+
+/* ================= VinAura additions ================= */
+#vinaura-lp{--code:#0f1726;--code-2:#162137;--code-line:#23304a}
+#vinaura-lp .va-logo-mark{background:linear-gradient(140deg,#3b7cf0,#1a4fb8 55%,#0f8a7e)}
+#vinaura-lp code{font:500 .9em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--soft-2);padding:2px 6px;border-radius:6px;color:var(--ink);word-break:break-word}
+
+/* code blocks */
+#vinaura-lp .va-code{position:relative;margin-top:16px;border-radius:14px;background:var(--code);border:1px solid var(--code-line);box-shadow:0 18px 40px -26px rgba(10,20,40,.6);overflow:hidden}
+#vinaura-lp .va-code-bar{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px 0 16px;background:var(--code-2);border-bottom:1px solid var(--code-line);font:600 12px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:#8ea2c4}
+#vinaura-lp .va-code-bar span{flex:1}
+#vinaura-lp .va-copy{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:7px;border:1px solid #2c3b59;background:transparent;color:#c9d6ee;font:600 12px/1 var(--body);letter-spacing:0;text-transform:none;cursor:pointer;transition:background .2s ease,color .2s ease}
+#vinaura-lp .va-copy:hover{background:#22314f;color:#fff}
+#vinaura-lp .va-copy svg{width:13px;height:13px}
+#vinaura-lp .va-copy.va-done{color:#7fe3c8;border-color:#2c5a52}
+#vinaura-lp .va-code pre{margin:0;padding:16px 18px;overflow:auto;font:500 13.5px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#dfe8f7;background:none;border:0;white-space:pre;tab-size:2}
+#vinaura-lp .va-code pre code{background:none;padding:0;color:inherit;font:inherit;word-break:normal}
+#vinaura-lp .va-code .k{color:#8fb4ff;font-weight:600}
+#vinaura-lp .va-code .s{color:#a8e6a0}
+#vinaura-lp .va-code .c{color:#7d8ca6;font-style:italic}
+#vinaura-lp .va-code .n{color:#f3c178}
+#vinaura-lp .va-code .b{color:#f59ac2}
+
+/* showcase window (from the Rounds compare block) */
+#vinaura-lp .va-cmp{max-width:1080px;margin:0 auto}
+#vinaura-lp .va-seg{display:flex;width:max-content;max-width:100%;margin:0 auto 22px;padding:5px;border-radius:999px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+#vinaura-lp .va-seg button{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:0;background:none;color:var(--muted);font:600 15px/1 var(--body);cursor:pointer;transition:background .25s ease,color .25s ease,box-shadow .25s ease;white-space:nowrap}
+#vinaura-lp .va-seg button small{font:600 12px/1 var(--body);padding:4px 7px;border-radius:6px;background:var(--soft-2);color:var(--muted);transition:inherit}
+#vinaura-lp .va-seg button.va-on{background:var(--soft-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+#vinaura-lp .va-seg button.va-on small{background:var(--ink);color:#fff}
+#vinaura-lp .va-seg button.va-seg-new.va-on small{background:var(--brand)}
+#vinaura-lp .va-cmp-frame{padding:12px;border-radius:28px;background:linear-gradient(180deg,#f8f9fc,#eceff5);border:1px solid var(--line);box-shadow:inset 0 1px 0 #fff,0 50px 90px -40px rgba(15,27,45,.4)}
+#vinaura-lp .va-cmp-win{border-radius:18px;overflow:hidden;background:#fff;border:1px solid var(--line-2);box-shadow:0 1px 3px rgba(15,27,45,.08)}
+#vinaura-lp .va-cmp-bar{display:flex;align-items:center;gap:7px;height:40px;padding:0 16px;border-bottom:1px solid var(--line);background:#fbfcfe}
+#vinaura-lp .va-cmp-bar i{width:11px;height:11px;border-radius:50%}
+#vinaura-lp .va-cmp-bar i:nth-child(1){background:#f1a5a0}#vinaura-lp .va-cmp-bar i:nth-child(2){background:#f3d08b}#vinaura-lp .va-cmp-bar i:nth-child(3){background:#a9d7a3}
+#vinaura-lp .va-cmp-bar span{margin:0 auto;padding-right:46px;font:600 13px/1 var(--body);color:var(--ink-2)}
+#vinaura-lp .va-cmp-bar span em{font-style:normal;color:var(--muted);font-weight:500}
+#vinaura-lp .va-show-stage{aspect-ratio:2400/1500}
+
+/* problem / answer */
+#vinaura-lp .va-vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#vinaura-lp .va-vs-card{border-radius:26px;padding:34px;background:#fff;border:1px solid var(--line)}
+#vinaura-lp .va-vs-card.va-vs-new{background:linear-gradient(160deg,#eef4ff,#fff 65%);border-color:#cfdcf6}
+#vinaura-lp .va-vs-card h3{font-size:24px}
+#vinaura-lp .va-vs-card .va-tag{display:inline-block;font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+#vinaura-lp .va-vs-card.va-vs-new .va-tag{color:var(--brand)}
+#vinaura-lp .va-vs-card ul{margin-top:20px;display:grid;gap:12px}
+#vinaura-lp .va-vs-card li{display:flex;gap:12px;font-size:16px;line-height:1.5;color:var(--ink-2)}
+#vinaura-lp .va-vs-card li svg{width:20px;height:20px;flex:none;margin-top:2px}
+#vinaura-lp .va-vs-card .va-x svg{color:#b34b5c}
+#vinaura-lp .va-vs-card .va-ok svg{color:var(--teal)}
+
+/* three steps */
+#vinaura-lp .va-how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+#vinaura-lp .va-how-step{position:relative;border-radius:26px;padding:30px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column}
+#vinaura-lp .va-how-no{font:600 64px/.9 var(--head);letter-spacing:-.06em;color:var(--brand);opacity:.9}
+#vinaura-lp .va-how-step h3{font-size:22px;margin-top:18px}
+#vinaura-lp .va-how-step p{font-size:15.5px;color:var(--ink-2);margin-top:8px}
+#vinaura-lp .va-how-step .va-code{margin-top:auto}
+#vinaura-lp .va-how-step .va-code pre{font-size:12.5px;padding:14px 16px}
+#vinaura-lp .va-how-step > p + .va-code{margin-top:18px}
+
+/* gallery of PDFs */
+#vinaura-lp .va-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 22px;align-items:start}
+#vinaura-lp .va-gallery .va-wide{grid-column:span 2}
+#vinaura-lp .va-sheet{position:relative;display:block;padding:0;border:0;background:none;cursor:zoom-in;text-align:left;color:inherit}
+#vinaura-lp .va-sheet img{width:100%;border-radius:6px;border:1px solid var(--line);background:#fff;box-shadow:0 2px 4px rgba(28,34,48,.05),0 30px 50px -30px rgba(28,34,48,.45);transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s ease}
+#vinaura-lp .va-sheet:hover img{transform:translateY(-4px) rotate(-.3deg);box-shadow:0 2px 4px rgba(28,34,48,.05),0 40px 60px -30px rgba(28,34,48,.55)}
+#vinaura-lp .va-gallery figcaption{margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--ink-2)}
+#vinaura-lp .va-gallery figcaption b{display:block;font:600 16.5px/1.3 var(--head);color:var(--ink);letter-spacing:-.01em}
+#vinaura-lp .va-sheet-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#vinaura-lp .va-zoom{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;background:rgba(15,27,45,.72);color:#fff;display:grid;place-items:center;opacity:0;transition:opacity .25s ease}
+#vinaura-lp .va-zoom svg{width:16px;height:16px}
+#vinaura-lp .va-sheet:hover .va-zoom,#vinaura-lp .va-sheet:focus-visible .va-zoom{opacity:1}
+
+/* lightbox */
+#vinaura-lp dialog.va-lb{border:0;padding:0;background:transparent;max-width:min(1200px,96vw);max-height:94vh;overflow:visible}
+#vinaura-lp dialog.va-lb::backdrop{background:rgba(10,16,28,.82)}
+#vinaura-lp .va-lb img{max-width:min(1200px,96vw);max-height:88vh;width:auto;height:auto;border-radius:8px;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#vinaura-lp .va-lb p{margin-top:12px;color:#dfe6f2;font-size:15px;text-align:center}
+#vinaura-lp .va-lb-close{position:absolute;right:-8px;top:-8px;width:40px;height:40px;border-radius:50%;border:0;background:#fff;color:var(--ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+#vinaura-lp .va-lb-close svg{width:18px;height:18px}
+#vinaura-lp [data-zoom]{cursor:zoom-in}
+
+/* tutorial */
+#vinaura-lp .va-tut-intro{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+#vinaura-lp .va-tut-intro a{display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:16px;background:#fff;border:1px solid var(--line);color:var(--ink);font:600 15.5px/1.3 var(--head);transition:border-color .2s ease,transform .2s ease}
+#vinaura-lp .va-tut-intro a:hover{border-color:var(--brand);transform:translateY(-2px);color:var(--ink)}
+#vinaura-lp .va-tut-intro a i{font-style:normal;width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-ink);font:700 13px/1 var(--head)}
+#vinaura-lp .va-chap .va-fcard .va-code{margin-top:18px}
+#vinaura-lp .va-chap-grid>*,#vinaura-lp .va-chap-cards,#vinaura-lp .va-fcard,#vinaura-lp .va-how-step{min-width:0}
+#vinaura-lp .va-shot{margin-top:18px;border-radius:14px;overflow:hidden;border:1px solid var(--line-2);box-shadow:0 20px 40px -26px rgba(28,34,48,.45);background:#fff}
+#vinaura-lp .va-shot-bar{display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:#f7f8fb;border-bottom:1px solid var(--line)}
+#vinaura-lp .va-shot-bar i{width:9px;height:9px;border-radius:50%;background:#d8dee8}
+#vinaura-lp .va-shot-bar i:nth-child(1){background:#f1a5a0}#vinaura-lp .va-shot-bar i:nth-child(2){background:#f3d08b}#vinaura-lp .va-shot-bar i:nth-child(3){background:#a9d7a3}
+#vinaura-lp .va-shot-bar span{margin-left:8px;font:600 12px/1 var(--body);color:var(--muted)}
+#vinaura-lp .va-shot img{width:100%;display:block}
+#vinaura-lp .va-fcard ol.va-list,#vinaura-lp .va-fcard ul.va-list{margin-top:12px;display:grid;gap:8px;counter-reset:vali}
+#vinaura-lp .va-fcard .va-list li{position:relative;padding-left:30px;font-size:15.5px;line-height:1.55;color:var(--ink-2)}
+#vinaura-lp .va-fcard ol.va-list li{counter-increment:vali}
+#vinaura-lp .va-fcard ol.va-list li::before{content:counter(vali);position:absolute;left:0;top:1px;width:21px;height:21px;border-radius:50%;background:var(--brand-soft);color:var(--brand-ink);font:700 12px/21px var(--head);text-align:center}
+#vinaura-lp .va-fcard ul.va-list li::before{content:"";position:absolute;left:6px;top:9px;width:8px;height:8px;border-radius:2px;background:var(--c,var(--brand));opacity:.6}
+#vinaura-lp .va-note{margin-top:16px;padding:14px 16px;border-radius:12px;background:#fff8e6;border:1px solid #f0dfb3;font-size:14.5px;line-height:1.55;color:#5c4a1f}
+#vinaura-lp .va-note b{color:#3f3212}
+#vinaura-lp .va-kbd{display:inline-block;padding:1px 7px;border-radius:6px;border:1px solid var(--line-2);border-bottom-width:2px;background:#fff;font:600 13px/1.5 var(--body);color:var(--ink)}
+#vinaura-lp .va-tokens{margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14.5px;color:var(--ink-2);align-items:baseline}
+#vinaura-lp .va-tokens code{white-space:nowrap}
+
+/* stats row under the architecture */
+#vinaura-lp .va-tech .va-layer .va-num{font-size:13px}
+
+/* pricing / request steps */
+#vinaura-lp .va-price{margin-top:30px;padding:22px 24px;border-radius:18px;background:#fff;border:1px solid var(--line);display:flex;gap:18px;align-items:flex-start}
+#vinaura-lp .va-price .va-ico{flex:none}
+#vinaura-lp .va-price b{display:block;font:600 18px/1.3 var(--head);color:var(--ink)}
+#vinaura-lp .va-price p{font-size:15px;color:var(--ink-2);margin-top:4px}
+
+@media (max-width:1080px){
+  #vinaura-lp .va-gallery{grid-template-columns:1fr 1fr}
+  #vinaura-lp .va-tut-intro{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  #vinaura-lp .va-vs,#vinaura-lp .va-how{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  #vinaura-lp .va-gallery .va-wide{grid-column:auto}
+  #vinaura-lp .va-gallery,#vinaura-lp .va-tut-intro{grid-template-columns:1fr}
+  #vinaura-lp .va-vs-card,#vinaura-lp .va-how-step{padding:24px}
+  #vinaura-lp .va-code pre{font-size:12.5px;padding:14px}
+  #vinaura-lp .va-tokens{grid-template-columns:1fr}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="va-i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="va-i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="va-i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="va-i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="va-i-xc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="m9 9 6 6M15 9l-6 6"/></symbol>
+    <symbol id="va-i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="va-i-doc" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="va-i-pen" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+    <symbol id="va-i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+    <symbol id="va-i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+    <symbol id="va-i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="m20 20-3.5-3.5M11 8v6M8 11h6"/></symbol>
+    <symbol id="va-i-layers" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m12 2 10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5"/></symbol>
+    <symbol id="va-i-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 9h18M3 14h18M9 9v11"/></symbol>
+    <symbol id="va-i-sigma" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 5H6l6 7-6 7h12"/></symbol>
+    <symbol id="va-i-brace" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M8 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h1M16 3h1a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-1"/></symbol>
+    <symbol id="va-i-rupee" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 4h12M6 9h12M9 4c6 0 6 10 0 10H6l8 7"/></symbol>
+    <symbol id="va-i-eye" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="va-i-barcode" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 5v14M7 5v14M11 5v14M14 5v14M17 5v14M20 5v14"/></symbol>
+    <symbol id="va-i-stack" viewBox="0 0 24 24"><rect x="7" y="3" width="13" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M4 7v12a2 2 0 0 0 2 2h10"/></symbol>
+    <symbol id="va-i-page" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="2 2" d="M8 6h8v12H8z"/></symbol>
+    <symbol id="va-i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="9" r="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="va-i-font" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 20 10 4h1l6 16M6.5 14h8M17 20h4"/></symbol>
+    <symbol id="va-i-swap" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 8h13l-3-3M20 16H7l3 3"/></symbol>
+    <symbol id="va-i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+    <symbol id="va-i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="va-i-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M3 9h18"/></symbol>
+    <symbol id="va-i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="va-i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="va-i-tag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ Header ============ -->
+<nav class="va-nav" aria-label="VinAura">
+  <div class="va-navrow">
+    <div class="va-bar">
+      <div class="va-bar-top">
+        <a class="va-logo" href="#va-top"><span class="va-logo-mark"><svg><use href="#va-i-doc"/></svg></span>VinAura <small>PDF</small></a>
+        <div class="va-nav-links">
+          <button type="button" class="va-nl" data-panel="product" aria-expanded="false">Product <svg class="va-chev"><use href="#va-i-chev"/></svg></button>
+          <button type="button" class="va-nl" data-panel="tutorial" aria-expanded="false">Tutorial <svg class="va-chev"><use href="#va-i-chev"/></svg></button>
+          <a class="va-nl" href="#va-pdfs">Sample PDFs</a>
+          <a class="va-nl" href="#va-faq">FAQ</a>
+        </div>
+        <button type="button" class="va-burger" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
+      </div>
+      <div class="va-panels"><div class="va-panels-in">
+        <div class="va-panel" data-panel="product">
+          <a class="va-pcard" href="#va-inside"><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>See the designer</b><small>Queries, bands, tables and live preview</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
+          <ul class="va-plist"><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li><li><a href="#va-get">Request VinAura</a></li><li class="va-pnote">Pure PL/SQL. Oracle Database 19c or later, Oracle APEX 26.1 designer.</li></ul>
+        </div>
+        <div class="va-panel" data-panel="tutorial">
+          <a class="va-pcard" href="#va-tutorial"><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>The tutorial</b><small>From install to a PDF in a dialog</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
+          <ul class="va-plist"><li><a href="#va-t1">1. Install</a></li><li><a href="#va-t2">2. Write the queries</a></li><li><a href="#va-t3">3. Design the layout</a></li><li><a href="#va-t4">4. Preview and save</a></li><li><a href="#va-t5">5. Get the PDF as a BLOB</a></li><li><a href="#va-t6">6. Show it in a dialog</a></li><li><a href="#va-t7">7. New tab and download</a></li><li><a href="#va-t8">8. Batches, labels, e-mail, REST</a></li></ul>
+        </div>
+        <div class="va-panel" data-panel="all">
+          <div class="va-pgroup"><h4>Product</h4><ul class="va-plist"><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li></ul></div>
+          <div class="va-pgroup"><h4>Tutorial</h4><ul class="va-plist"><li><a href="#va-t1">Install</a></li><li><a href="#va-t2">Write the queries</a></li><li><a href="#va-t3">Design the layout</a></li><li><a href="#va-t5">Get the PDF as a BLOB</a></li><li><a href="#va-t6">Show it in a dialog</a></li><li><a href="#va-t8">Batches, labels, e-mail, REST</a></li></ul></div>
+          <div class="va-pgroup"><h4>Help</h4><ul class="va-plist"><li><a href="#va-faq">FAQ</a></li><li><a href="#va-get">Request VinAura</a></li></ul></div>
+        </div>
+      </div></div>
+    </div>
+    <a class="va-quote" href="#va-get" aria-label="Request VinAura"><span class="va-quote-t">Request VinAura</span><span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
+  </div>
+</nav>
+
+<!-- ============ Hero ============ -->
+<section class="va-hero" id="va-top">
+  <div class="va-wrap">
+    <div class="va-hero-copy">
+      <a class="va-pill" href="#va-how"><b>NEW</b> Pure PL/SQL: no BI Publisher, no print server</a>
+      <h1>The visual <em>PDF report designer</em> for <span style="white-space:nowrap">Oracle APEX</span></h1>
+      <p class="va-lead">Draw invoices, statements and labels on a canvas, bind them to your SQL queries and page items, and get the PDF from any APEX page with one PL/SQL call. VinAura runs entirely inside your Oracle database: nothing to install on a server, no Word templates, no extra licences.</p>
+      <div class="va-cta">
+        <a class="va-btn va-btn-primary" href="#va-get">Request VinAura <svg><use href="#va-i-arrow"/></svg></a>
+        <a class="va-btn va-btn-ghost" href="#va-tutorial"><svg><use href="#va-i-book"/></svg> Read the tutorial</a>
+      </div>
+      <ul class="va-chips" aria-label="What it makes">
+        <li style="--c:var(--mustard)">Invoices</li><li style="--c:var(--teal)">Statements</li><li style="--c:var(--terra)">Labels &amp; barcodes</li><li style="--c:var(--navy)">Batch PDFs</li><li style="--c:var(--green)">Totals &amp; groups</li><li style="--c:var(--rose)">Page X of Y</li><li style="--c:var(--brand)">One PL/SQL call</li>
+      </ul>
+    </div>
+    <div class="va-stage va-reveal">
+      <div class="va-glow"></div>
+      <div class="va-browser">
+        <div class="va-browser-bar"><i></i><i></i><i></i><span>VinAura &middot; Designer</span></div>
+        <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" width="2400" height="1500" alt="VinAura PDF report designer for Oracle APEX: SQL queries on the left, an invoice layout with bands on the canvas, table properties on the right" fetchpriority="high">
+      </div>
+      <div class="va-fc va-fc-1" aria-hidden="true"><span class="va-dot" style="--c:var(--teal)"><svg><use href="#va-i-bolt"/></svg></span><div><b>Invoice ready</b>made in about 30 ms</div></div>
+      <div class="va-fc va-fc-2" aria-hidden="true"><span class="va-dot" style="--c:var(--navy)"><svg><use href="#va-i-table"/></svg></span><div><b>Page 2 of 2</b>header row repeated</div></div>
+      <div class="va-fc va-fc-3" aria-hidden="true"><span class="va-dot" style="--c:var(--terra)"><svg><use href="#va-i-brace"/></svg></span><div><b>pdf_api.generate</b>returns the BLOB</div></div>
+      <div class="va-fc va-fc-4" aria-hidden="true"><span class="va-dot" style="--c:var(--rose)"><svg><use href="#va-i-barcode"/></svg></span><div><b>24 labels</b>with Code 128 barcodes</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Instead of ============ -->
+<div class="va-trust">
+  <div class="va-wrap">
+    <p>What you no longer need for PDFs in APEX</p>
+    <ul>
+      <li><svg><use href="#va-i-xc"/></svg><span>BI Publisher<small>and its print server</small></span></li>
+      <li><svg><use href="#va-i-xc"/></svg><span>Word / RTF templates<small>and XML mapping</small></span></li>
+      <li><svg><use href="#va-i-xc"/></svg><span>Hand-coded PDF<small>x/y positions in PL/SQL</small></span></li>
+      <li><svg><use href="#va-i-xc"/></svg><span>External services<small>your data stays in the database</small></span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ Why ============ -->
+<section class="va-story va-slab va-bg-sand" id="va-why">
+  <div class="va-wrap">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">Why VinAura</span>
+      <h2 class="va-h2">PDF reports in APEX shouldn't need a second product</h2>
+      <p class="va-lead">An invoice with a logo, a bill-to box, a table of lines, totals and a signature is everyday work. In APEX it usually means BI Publisher and Word templates, or a PDF library where every line is placed by hand. VinAura gives you a designer instead, and keeps the whole thing in PL/SQL.</p>
+    </div>
+    <div class="va-vs">
+      <div class="va-vs-card va-reveal">
+        <span class="va-tag">The usual way</span>
+        <h3>Templates, mappings and a print server</h3>
+        <ul>
+          <li class="va-x"><svg><use href="#va-i-xc"/></svg><span>Design in Microsoft Word, then map every field to an XML element.</span></li>
+          <li class="va-x"><svg><use href="#va-i-xc"/></svg><span>Install and license a print server, and keep it running beside the database.</span></li>
+          <li class="va-x"><svg><use href="#va-i-xc"/></svg><span>Or write a PDF by hand: every text, line and page break at x/y positions in code.</span></li>
+          <li class="va-x"><svg><use href="#va-i-xc"/></svg><span>A change of layout means a developer, a new template and a new deployment.</span></li>
+        </ul>
+      </div>
+      <div class="va-vs-card va-vs-new va-reveal">
+        <span class="va-tag">With VinAura</span>
+        <h3>A designer, your queries and one call</h3>
+        <ul>
+          <li class="va-ok"><svg><use href="#va-i-checkc"/></svg><span>Draw the page in the browser: text and fields, boxes, lines, images, tables, barcodes.</span></li>
+          <li class="va-ok"><svg><use href="#va-i-checkc"/></svg><span>Bind it to up to ten SQL queries that use your page items, <code>:P11_INVOICE_ID</code>.</span></li>
+          <li class="va-ok"><svg><use href="#va-i-checkc"/></svg><span><code>pdf_api.generate('INVOICE')</code> returns the PDF as a BLOB, made in the database.</span></li>
+          <li class="va-ok"><svg><use href="#va-i-checkc"/></svg><span>Change the layout, press Save: every page that prints it uses the new one at once.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ How it works ============ -->
+<section class="va-mods va-slab va-bg-paper" id="va-how">
+  <div class="va-wrap">
+    <div class="va-head va-center va-reveal">
+      <span class="va-eyebrow">How it works</span>
+      <h2 class="va-h2">Three steps from data to PDF</h2>
+      <p class="va-lead">Queries give the data, the designer gives the look, and one procedure makes the PDF wherever you need it.</p>
+    </div>
+    <div class="va-how">
+      <div class="va-how-step va-reveal">
+        <span class="va-how-no">01</span>
+        <h3>Write the queries</h3>
+        <p>One SELECT for each part of the document: the header, the lines, the totals. Page items are bind variables.</p>
+        <div class="va-code"><div class="va-code-bar"><span>Q2 &middot; invoice lines</span></div><pre><code>select line_no, description, qty,
+       unit_price, amount
+  from invoice_lines
+ where invoice_id = :P11_INVOICE_ID
+ order by line_no</code></pre></div>
+      </div>
+      <div class="va-how-step va-reveal">
+        <span class="va-how-no">02</span>
+        <h3>Draw the layout</h3>
+        <p>Drag fields onto the page, add a table for the lines with totals, boxes, a logo and page numbers. Preview it at once.</p>
+        <div class="va-shot" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-fields.webp" data-cap="The designer: the fields of the queries on the left, a field selected on the canvas, its properties on the right."><div class="va-shot-bar"><i></i><i></i><i></i><span>Designer</span></div><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-fields.webp" alt="VinAura designer with the fields of the queries and a selected field" loading="lazy" width="2400" height="1500"></div>
+      </div>
+      <div class="va-how-step va-reveal">
+        <span class="va-how-no">03</span>
+        <h3>Call it from APEX</h3>
+        <p>Get the BLOB to store or e-mail, or send it to the browser in a dialog or a new tab.</p>
+        <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span></div><pre><code>declare
+  l_pdf blob;
+begin
+  l_pdf := pdf_api.generate('INVOICE');
+end;</code></pre></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Inside ============ -->
+<section class="va-story va-slab va-bg-sand" id="va-inside">
+  <div class="va-wrap">
+    <div class="va-head va-center va-reveal">
+      <span class="va-eyebrow">Inside VinAura</span>
+      <h2 class="va-h2">A real designer, in your APEX workspace</h2>
+    </div>
+    <div class="va-cmp va-show va-reveal">
+      <div class="va-seg" role="tablist" aria-label="Screens"><button type="button" role="tab" class="va-on" aria-selected="true" data-show="0">Designer</button><button type="button" role="tab" aria-selected="false" data-show="1">Queries</button><button type="button" role="tab" aria-selected="false" data-show="2">Preview</button><button type="button" role="tab" aria-selected="false" data-show="3">Labels</button><button type="button" role="tab" aria-selected="false" data-show="4">Page setup</button><button type="button" role="tab" aria-selected="false" data-show="5">In your app</button><button type="button" role="tab" aria-selected="false" data-show="6">PDF dialog</button></div>
+      <div class="va-cmp-frame">
+        <div class="va-cmp-win">
+          <div class="va-cmp-bar"><i></i><i></i><i></i><span>VinAura <em>&middot; <b class="va-show-title">Designer</b></em></span></div>
+          <div class="va-show-stage">
+            <img class="va-on" src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" data-title="Designer" data-cap="The page in bands: page header, report header, the body with its table, the summary and the page footer. The selected table shows its columns, formats and totals on the right." alt="VinAura designer: an invoice layout with its table selected and the column properties" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-queries.webp" data-title="Queries" data-cap="Up to ten queries per report, each checked as you write it: its columns become fields, its bind variables become parameters." alt="VinAura designer: the three queries of an invoice with their columns and bind variables" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-preview.webp" data-title="Preview" data-cap="Preview makes the real PDF from the unsaved layout, with test values for the page items: 1 page, 35 KB, made in 30 ms." alt="VinAura preview of a tax invoice PDF made from the designer" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-labels.webp" data-title="Labels" data-cap="A label layout: one label, repeated for every row of its query across and down the sheet, with a Code 128 barcode." alt="VinAura designer: a product label with a barcode" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-page-setup.webp" data-title="Page setup" data-cap="A4, A3, A5, Letter, Legal and more, or a custom size; portrait or landscape; margins in millimetres, inches or points." alt="VinAura page setup: page size, orientation, width, height and margins" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-invoice-edit.webp" data-title="In your app" data-cap="An ordinary APEX form, with Preview Invoice and New tab buttons: this is the demo application that comes with VinAura." alt="An APEX invoice form with lines, totals and Preview Invoice and New tab buttons" width="2400" height="1500" loading="lazy">
+            <img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp" data-title="PDF dialog" data-cap="A modal page with a URL region shows the PDF: 3 invoices in one batch document, each with its own page numbers." alt="An APEX modal dialog showing a batch of tax invoices as a PDF" width="2400" height="1500" loading="lazy">
+          </div>
+          <div class="va-show-bar"><i></i></div>
+        </div>
+      </div>
+      <p class="va-show-cap" aria-live="polite">The page in bands: page header, report header, the body with its table, the summary and the page footer. The selected table shows its columns, formats and totals on the right.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Features ============ -->
+<section class="va-mods va-slab va-bg-paper" id="va-features">
+  <div class="va-wrap">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">Features</span>
+      <h2 class="va-h2">Everything an invoice, a statement or a label needs</h2>
+    </div>
+    <div class="va-tiles">
+      <div class="va-tile va-reveal" style="--c:var(--brand)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-layers"/></svg></span><span class="va-tile-no">01</span></span><b>Bands that flow</b><span class="va-tile-t">Page header and footer on every page, a report header once, a body that grows over pages, a summary at the end or at the foot of the last page.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--navy)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-table"/></svg></span><span class="va-tile-no">02</span></span><b>Tables over pages</b><span class="va-tile-t">Rows grow with long text, the header row repeats on every page, zebra rows and grid lines as you like.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--teal)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-sigma"/></svg></span><span class="va-tile-no">03</span></span><b>Totals and groups</b><span class="va-tile-t">Sum, count, average, min and max per column; group headings with sub-totals; totals of any query anywhere on the page.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--violet)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-brace"/></svg></span><span class="va-tile-no">04</span></span><b>Fields and formats</b><span class="va-tile-t">Mix text and fields: <code>Invoice No. {Q1.INVOICE_NO}</code>, with Oracle format masks for numbers and dates.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--terra)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-rupee"/></svg></span><span class="va-tile-no">05</span></span><b>Amount in words</b><span class="va-tile-t"><code>{WORDS(Q3.TOTAL)}</code> in lakh and crore with paise, or in million and billion.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--green)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-eye"/></svg></span><span class="va-tile-no">06</span></span><b>Print when</b><span class="va-tile-t">Show an element only when a condition holds: a PAID stamp when <code>{Q1.STATUS} = PAID</code>.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--mustard)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-barcode"/></svg></span><span class="va-tile-no">07</span></span><b>Labels and barcodes</b><span class="va-tile-t">Sheets of labels across and down, Code 128 barcodes, a start position for a sheet that is already partly used.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--rose)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-stack"/></svg></span><span class="va-tile-no">08</span></span><b>Batch documents</b><span class="va-tile-t">One document per row of a query: all the invoices of a day in one PDF, each with its own page numbers.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--slate)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-page"/></svg></span><span class="va-tile-no">09</span></span><b>Any page size</b><span class="va-tile-t">A3 to A6, Letter, Legal, envelopes or a custom size, portrait or landscape, with your margins.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--brand)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-image"/></svg></span><span class="va-tile-no">10</span></span><b>Logos and images</b><span class="va-tile-t">Upload a logo, a stamp or a signature once; or print an image from a BLOB column of your query.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--teal)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-font"/></svg></span><span class="va-tile-no">11</span></span><b>Fonts and shapes</b><span class="va-tile-t">Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier; boxes, rounded boxes, circles and dashed lines.</span></div>
+      <div class="va-tile va-reveal" style="--c:var(--navy)"><span class="va-tile-top"><span class="va-ico"><svg><use href="#va-i-swap"/></svg></span><span class="va-tile-no">12</span></span><b>Export, import and log</b><span class="va-tile-t">Move a report from development to production as JSON; every PDF made is logged with its time and size.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Sample PDFs ============ -->
+<section class="va-story va-slab va-bg-sand" id="va-pdfs">
+  <div class="va-wrap">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">Sample PDFs</span>
+      <h2 class="va-h2">Real PDFs, made by VinAura</h2>
+      <p class="va-lead">These come with VinAura as ready-made reports on demo data. Open one, change it in the designer, and see what the engine does with long tables, totals and page breaks.</p>
+    </div>
+    <div class="va-gallery">
+      <figure class="va-reveal"><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice.webp" data-cap="A GST tax invoice with a logo, a bill-to box, the lines, totals, the amount in words and a PAID stamp."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice.webp" alt="Tax invoice PDF made by VinAura with a PAID stamp" loading="lazy" width="1400" height="1980"><span class="va-zoom"><svg><use href="#va-i-zoom"/></svg></span></button><figcaption><b>Tax invoice</b>Logo, boxes, totals, amount in words and a PAID stamp that prints only on paid invoices.</figcaption></figure>
+      
+      <figure class="va-reveal"><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-statement.webp" data-cap="A statement of account: every invoice with paid and balance, overdue days and the balance in words."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-statement.webp" alt="Customer statement of account PDF" loading="lazy" width="1400" height="1980"><span class="va-zoom"><svg><use href="#va-i-zoom"/></svg></span></button><figcaption><b>Statement of account</b>Totals of a query in the header, paid and balance per invoice, overdue days.</figcaption></figure>
+      <figure class="va-reveal"><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-labels.webp" data-cap="Shelf labels: 3 across and 8 down on A4, with the name, SKU, a Code 128 barcode and the price."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-labels.webp" alt="Sheet of product labels with barcodes" loading="lazy" width="1400" height="1980"><span class="va-zoom"><svg><use href="#va-i-zoom"/></svg></span></button><figcaption><b>Product labels</b>24 labels on an A4 sheet, each with a Code 128 barcode.</figcaption></figure>
+      <figure class="va-reveal va-wide"><div class="va-sheet-pair"><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice-p1.webp" data-cap="A 46-line invoice, page 1: the table fills the page."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice-p1.webp" alt="Page 1 of a long invoice" loading="lazy" width="1400" height="1980"></button><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice-p2.webp" data-cap="Page 2: the header row repeats, the totals and the summary follow the last line."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-pdf-invoice-p2.webp" alt="Page 2 of a long invoice with totals" loading="lazy" width="1400" height="1980"></button></div><figcaption><b>A long invoice</b>46 lines over two pages: the header row repeats, long descriptions wrap, the totals come after the last line.</figcaption></figure>
+      <figure class="va-reveal"><button type="button" class="va-sheet" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-statement-dialog.webp" data-cap="The statement of a customer in a modal dialog of the demo application, opened from a row of the Customers report."><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-statement-dialog.webp" alt="A customer statement PDF in an APEX modal dialog" loading="lazy" width="2400" height="1500"><span class="va-zoom"><svg><use href="#va-i-zoom"/></svg></span></button><figcaption><b>In your application</b>The same statement in a modal dialog, opened from a row of the Customers report.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Tutorial ============ -->
+<section class="va-mods va-slab va-bg-paper" id="va-tutorial" style="padding-bottom:40px">
+  <div class="va-wrap">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">Tutorial</span>
+      <h2 class="va-h2">From install to a PDF in a dialog</h2>
+      <p class="va-lead">Everything below is also in the application, on its <em>How to Use</em> page, and in the demo screens that come with it. The names are those of the demo: an invoice form on page 11 with the item <code>P11_INVOICE_ID</code>.</p>
+    </div>
+    <nav class="va-tut-intro" aria-label="Tutorial chapters">
+      <a href="#va-t1"><i>1</i>Install</a><a href="#va-t2"><i>2</i>Write the queries</a><a href="#va-t3"><i>3</i>Design the layout</a><a href="#va-t4"><i>4</i>Preview and save</a>
+      <a href="#va-t5"><i>5</i>Get the PDF as a BLOB</a><a href="#va-t6"><i>6</i>Show it in a dialog</a><a href="#va-t7"><i>7</i>New tab and download</a><a href="#va-t8"><i>8</i>Batches, labels, e-mail, REST</a>
+    </nav>
+  </div>
+
+  <article class="va-chap" id="va-t1">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--brand)"><svg><use href="#va-i-db"/></svg></span>Chapter 1 <i>&middot; Install</i></span>
+        <h3>Install it in minutes</h3>
+        <p>VinAura is an APEX application and a set of PL/SQL packages and tables. Install it in a schema of its own, or straight into your application's schema.</p>
+        <div class="va-chap-menu"><b>You need</b>Oracle Database 19c or later with APEX. The designer application is an APEX 26.1 export.</div>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--brand)">
+          <h4>The quick way: import the application</h4>
+          <ol class="va-list">
+            <li>App Builder &gt; Import &gt; <code>pdf_report_designer.sql</code> from the VinAura zip.</li>
+            <li>Choose the parsing schema, and <b>Install Supporting Objects</b>.</li>
+            <li>It creates the <code>PDF_*</code> tables and packages, and the demo tables and sample reports.</li>
+          </ol>
+        </div>
+        <div class="va-fcard" style="--c:var(--teal)">
+          <h4>Into your own application's schema</h4>
+          <p>Run the scripts in this order as your schema, then import the application without its supporting objects. Leave out the demo scripts and the <b>Demo</b> menu hides itself.</p>
+          <div class="va-code"><div class="va-code-bar"><span>SQLcl / SQL Developer</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>@sql/10_tables.sql
+@sql/20_pdf_writer.sql
+@sql/30_pdf_engine.sql
+@sql/40_pdf_api.sql
+@sql/45_pdf_designer.sql   -- where the designer runs
+-- optional demo: @sql/50_demo_data.sql  @sql/60_samples.sql</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--violet)">
+          <h4>Or a schema of its own, shared by several applications</h4>
+          <p>One grant and one synonym for every application schema that prints. The queries of a report always run as the schema that calls the API, so each application reads its own tables.</p>
+          <div class="va-code"><div class="va-code-bar"><span>SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>grant execute on pdfgen.pdf_api to your_schema;
+-- then, as your_schema:
+create synonym pdf_api for pdfgen.pdf_api;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t2">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--navy)"><svg><use href="#va-i-db"/></svg></span>Chapter 2 <i>&middot; Queries</i></span>
+        <h3>Create a report and write its queries</h3>
+        <p>Reports &gt; New Report. Give it a code, for example <code>INVOICE</code>: your pages call the report by it. Then write one query for each part of the document.</p>
+        <div class="va-chap-menu"><b>Tip</b>Use your page items as bind variables. When the report is printed, they take the values of the page.</div>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--navy)">
+          <h4>Q1: the header, one row</h4>
+          <div class="va-code"><div class="va-code-bar"><span>Q1</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>select i.invoice_no, i.invoice_date, i.due_date, i.status,
+       c.name customer_name, c.address, c.gstin
+  from invoices i
+  join customers c on c.customer_id = i.customer_id
+ where i.invoice_id = :P11_INVOICE_ID</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--teal)">
+          <h4>Q2: the lines, many rows</h4>
+          <div class="va-code"><div class="va-code-bar"><span>Q2</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>select l.line_no sno, p.name description, l.qty, l.unit_price,
+       round(l.qty * l.unit_price, 2) amount
+  from invoice_lines l
+  join products p on p.product_id = l.product_id
+ where l.invoice_id = :P11_INVOICE_ID
+ order by l.line_no</code></pre></div>
+          <p>Press <span class="va-kbd">&#10003;</span> beside a query to check it: its columns appear under <b>Fields</b>, its bind variables under <b>Parameters</b>, where you give test values for Preview.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t3">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--violet)"><svg><use href="#va-i-pen"/></svg></span>Chapter 3 <i>&middot; Layout</i></span>
+        <h3>Design the layout</h3>
+        <p>The page is divided in bands. Put what repeats on every page in the page header and footer, the bill-to boxes in the report header, the lines table in the body and the totals in the summary.</p>
+        <div class="va-chap-menu"><b>Keys</b>Del deletes, Ctrl+D duplicates, the arrows move (Shift: 10 pt), Ctrl+Z undoes, Ctrl+S saves.</div>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--violet)">
+          <h4>Fields, text, boxes and images</h4>
+          <ul class="va-list">
+            <li>Drag a field from <b>Fields</b> onto a band, or add a <b>Text / Field</b> and type text and fields together: <code>Invoice No. {Q1.INVOICE_NO}</code>.</li>
+            <li>Boxes, rounded boxes, circles and lines frame the page; upload a logo once and use it in every report.</li>
+            <li>Every element has a font, colour, alignment, border and background, and an optional <b>Print when</b> condition.</li>
+          </ul>
+          <div class="va-shot" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" data-cap="The invoice in the designer with its lines table selected."><div class="va-shot-bar"><i></i><i></i><i></i><span>Designer &middot; Tax Invoice</span></div><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" alt="The invoice layout in the VinAura designer" loading="lazy" width="2400" height="1500"></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--navy)">
+          <h4>A table for the lines</h4>
+          <p>Add a <b>Table</b> and choose its query (Q2). Its columns come from the fields; give each a heading, a width, an alignment, a format mask and a total. Drop more fields on the table to add columns.</p>
+        </div>
+        <div class="va-fcard" style="--c:var(--terra)">
+          <h4>Tokens you can type in any text</h4>
+          <div class="va-tokens">
+            <code>{Q1.CUSTOMER_NAME}</code><span>a column (the current row in a table or label, else the first row)</span>
+            <code>{Q3.TOTAL|FM999G990D00}</code><span>with a format mask</span>
+            <code>{SUM(Q2.AMOUNT)}</code><span>also COUNT, AVG, MIN, MAX over a query</span>
+            <code>{WORDS(Q3.TOTAL)}</code><span>the amount in words (lakh, crore, paise)</span>
+            <code>Page {PAGE} of {PAGES}</code><span>page numbers, in the page header or footer</span>
+            <code>{TODAY|DD-MON-YYYY}</code><span>also {NOW}, {APP_USER}, {REPORT}</span>
+          </div>
+        </div>
+        <div class="va-fcard" style="--c:var(--slate)">
+          <h4>Page setup</h4>
+          <p>Page size (A4 by default, A3, A5, Letter, Legal and more, or a custom size), portrait or landscape, margins, and the units the designer shows: millimetres, inches or points.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t4">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--green)"><svg><use href="#va-i-eye"/></svg></span>Chapter 4 <i>&middot; Preview</i></span>
+        <h3>Preview, save and try the API</h3>
+        <p><b>Preview</b> makes the real PDF from the layout on the screen, saved or not, with the test values of the Parameters tab. <b>Save</b> stores the layout and the queries; every page that prints the report uses it at once.</p>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--green)">
+          <h4>The preview</h4>
+          <div class="va-shot" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-preview.webp" data-cap="Preview in the designer: 1 page, 35 KB, made in 30 ms."><div class="va-shot-bar"><i></i><i></i><i></i><span>Preview</span></div><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-preview.webp" alt="Preview of the invoice PDF in the designer" loading="lazy" width="2400" height="1500"></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--brand)">
+          <h4>Try the API</h4>
+          <p>The <b>Try the API</b> page runs <code>pdf_api.download</code> for any report with the parameters you type, and shows the PL/SQL call to copy into your page.</p>
+          <div class="va-shot" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-try-api.webp" data-cap="Try the API: choose a report, give its parameters, see the PDF and the call."><div class="va-shot-bar"><i></i><i></i><i></i><span>Try the API</span></div><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-try-api.webp" alt="The Try the API page of VinAura" loading="lazy" width="2400" height="1500"></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t5">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--terra)"><svg><use href="#va-i-brace"/></svg></span>Chapter 5 <i>&middot; BLOB</i></span>
+        <h3>Get the PDF as a BLOB</h3>
+        <p><code>pdf_api.generate</code> returns the PDF. Page items are read from session state, or you give the values yourself as name/value pairs.</p>
+        <div class="va-chap-menu"><b>What the pairs mean</b><code>apex_t_varchar2('P11_INVOICE_ID', 1003)</code> fills the bind <code>:P11_INVOICE_ID</code> of the report's queries with 1003.</div>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--terra)">
+          <h4>In any PL/SQL: a process, a package, a job</h4>
+          <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>declare
+  l_pdf blob;
+begin
+  -- the page items of the queries come from session state
+  l_pdf := pdf_api.generate('INVOICE');
+
+  -- or give the values yourself
+  l_pdf := pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', 1003));
+
+  -- store it
+  update invoices set pdf = l_pdf where invoice_id = 1003;
+end;</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t6">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--rose)"><svg><use href="#va-i-window"/></svg></span>Chapter 6 <i>&middot; Dialog</i></span>
+        <h3>Show the PDF in a dialog</h3>
+        <p>Three declarative pieces, and no JavaScript: an application process that sends the PDF, a modal page with a URL region, and a link or button that opens it.</p>
+        <div class="va-chap-menu"><b>In the demo</b>Page 92 <em>Invoice PDF</em>, the process <code>INVOICE_PDF</code>, and the Preview links of the Invoices report.</div>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--rose)">
+          <h4>1. An application process</h4>
+          <p>Shared Components &gt; Application Processes, point <b>Ajax Callback</b>, name <code>INVOICE_PDF</code>:</p>
+          <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>pdf_api.download('INVOICE',
+  p_params   =&gt; apex_t_varchar2('P11_INVOICE_ID', :P92_INVOICE_ID),
+  p_filename =&gt; 'invoice-' || :P92_INVOICE_ID || '.pdf');</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--navy)">
+          <h4>2. A modal page with a URL region</h4>
+          <ul class="va-list">
+            <li>A new page, <b>Page Mode: Modal Dialog</b>, e.g. page 92 <em>Invoice PDF</em>, with a hidden item <code>P92_INVOICE_ID</code>.</li>
+            <li>One region of type <b>URL</b>, Inclusion Mode <b>IFrame</b>, URL:</li>
+          </ul>
+          <div class="va-code"><div class="va-code-bar"><span>URL of the region</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>f?p=&amp;APP_ID.:0:&amp;SESSION.:APPLICATION_PROCESS=INVOICE_PDF</code></pre></div>
+          <div class="va-code"><div class="va-code-bar"><span>IFrame attributes</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>style="width:100%;height:calc(100vh - 70px);border:0"</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--teal)">
+          <h4>3. Open it from a report or a form</h4>
+          <ul class="va-list">
+            <li><b>A column link</b> of an interactive report: Target page 92, Set Items <code>P92_INVOICE_ID</code> = <code>#INVOICE_ID#</code>.</li>
+            <li><b>A button</b> of a form page: Action <em>Redirect to Page in this Application</em>, page 92, Set Items <code>P92_INVOICE_ID</code> = <code>&amp;P11_INVOICE_ID.</code></li>
+          </ul>
+          <p>APEX opens it as a dialog because page 92 is a modal page.</p>
+          <div class="va-shot" data-zoom="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp" data-cap="The PDF in a modal dialog, opened from the invoice report."><div class="va-shot-bar"><i></i><i></i><i></i><span>Invoice PDF</span></div><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp" alt="An APEX modal dialog showing an invoice PDF" loading="lazy" width="2400" height="1500"></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t7">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--mustard)"><svg><use href="#va-i-arrow"/></svg></span>Chapter 7 <i>&middot; New tab</i></span>
+        <h3>A new tab, or a download</h3>
+        <p>The same application process opens in a new browser tab. A second process with <code>p_inline =&gt; false</code> downloads the file instead of showing it.</p>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--mustard)">
+          <h4>A "New tab" button</h4>
+          <p>Action <b>Redirect to URL</b>, target:</p>
+          <div class="va-code"><div class="va-code-bar"><span>URL of the button</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>javascript:window.open('f?p=&amp;APP_ID.:0:&amp;SESSION.:APPLICATION_PROCESS=INVOICE_PDF:::P92_INVOICE_ID:&amp;P11_INVOICE_ID.', '_blank');</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--green)">
+          <h4>A download</h4>
+          <div class="va-code"><div class="va-code-bar"><span>Application process INVOICE_DOWNLOAD</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>pdf_api.download('INVOICE',
+  p_params   =&gt; apex_t_varchar2('P11_INVOICE_ID', :P92_INVOICE_ID),
+  p_filename =&gt; 'invoice.pdf',
+  p_inline   =&gt; false);</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="va-chap" id="va-t8">
+    <div class="va-wrap va-chap-grid">
+      <div class="va-chap-head">
+        <span class="va-chap-no"><span class="va-ico" style="--c:var(--slate)"><svg><use href="#va-i-stack"/></svg></span>Chapter 8 <i>&middot; More</i></span>
+        <h3>Batches, labels, e-mail and REST</h3>
+        <p>The PDF is a BLOB in the database, so it goes wherever PL/SQL goes.</p>
+      </div>
+      <div class="va-chap-cards">
+        <div class="va-fcard" style="--c:var(--rose)">
+          <h4>All the invoices of a period in one PDF</h4>
+          <p>In the report's properties, <b>One document per row of</b> Q1. The other queries read the current row as <code>:Q1_INVOICE_ID</code>, and the page numbers restart for every invoice.</p>
+          <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>l_pdf := pdf_api.generate('INVOICE_BATCH',
+           apex_t_varchar2('P10_DATE_FROM', '01-SEP-2026', 'P10_DATE_TO', '30-SEP-2026'));</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--mustard)">
+          <h4>Labels on a sheet that is partly used</h4>
+          <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>-- 24 labels of one product, starting on the 5th label of the sheet
+l_pdf := pdf_api.generate('PRODUCT_LABELS',
+           apex_t_varchar2('P30_SKU', 'NW-GLV-100', 'P30_COPIES', 24, 'LABEL_START', 5));</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--brand)">
+          <h4>E-mail it</h4>
+          <div class="va-code"><div class="va-code-bar"><span>PL/SQL</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>declare
+  l_id number;
+begin
+  l_id := apex_mail.send(p_to   =&gt; 'customer@example.com',
+                         p_from =&gt; 'billing@example.com',
+                         p_subj =&gt; 'Your invoice',
+                         p_body =&gt; 'Please find your invoice attached.');
+  apex_mail.add_attachment(
+    p_mail_id    =&gt; l_id,
+    p_attachment =&gt; pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', 1003)),
+    p_filename   =&gt; 'invoice.pdf',
+    p_mime_type  =&gt; 'application/pdf');
+  apex_mail.push_queue;
+end;</code></pre></div>
+        </div>
+        <div class="va-fcard" style="--c:var(--teal)">
+          <h4>A REST endpoint with ORDS</h4>
+          <p>A GET handler of source type <b>Media Resource</b> returns the PDF to any client:</p>
+          <div class="va-code"><div class="va-code-bar"><span>ORDS handler</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>select 'application/pdf',
+       pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', :id))
+  from dual</code></pre></div>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ============ Architecture ============ -->
+<section class="va-tech va-slab" id="va-architecture">
+  <div class="va-wrap">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">Architecture</span>
+      <h2 class="va-h2">Pure PL/SQL, from your query to the PDF bytes</h2>
+      <p class="va-lead">No Java, no print server, no JavaScript library makes the PDF. It is written byte by byte by PL/SQL inside the database, so it runs wherever Oracle Database and APEX run.</p>
+    </div>
+    <div class="va-stack">
+      <div class="va-layers va-reveal">
+        <div class="va-layer"><span class="va-num">1</span><div><b>Your APEX application</b><span>calls pdf_api.generate or pdf_api.download</span></div></div>
+        <div class="va-layer va-core"><span class="va-num">2</span><div><b>PDF_API</b><span>runs the report's queries with your schema's rights and your page items</span></div></div>
+        <div class="va-layer"><span class="va-num">3</span><div><b>PDF_ENGINE</b><span>lays out bands, tables, groups, totals, labels and page numbers</span></div></div>
+        <div class="va-layer"><span class="va-num">4</span><div><b>PDF_WRITER</b><span>writes the PDF: fonts with their metrics, shapes, JPEG images</span></div></div>
+      </div>
+      <div class="va-stats va-reveal">
+        <div class="va-stat"><strong>~30 ms</strong><span>for a one-page invoice, logo and table included</span></div>
+        <div class="va-stat"><strong>1 call</strong><span>pdf_api.generate returns the BLOB</span></div>
+        <div class="va-stat"><strong>0</strong><span>servers, services or licences to add</span></div>
+        <div class="va-stat"><strong>10</strong><span>queries per report, with your page items</span></div>
+      </div>
+    </div>
+    <div class="va-tech-list">
+      <div><h4>Your data stays home</h4><p>The PDF is made where the data is. Nothing is sent to an outside service.</p></div>
+      <div><h4>Your schema's rights</h4><p>The API has invoker rights: every application reads only its own tables.</p></div>
+      <div><h4>Logged</h4><p>Every PDF made is logged: report, user, pages, size and time.</p></div>
+      <div><h4>Portable reports</h4><p>A report is a JSON layout and its queries: export, import, keep it in git.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Call-out ============ -->
+<section class="va-callout va-slab va-bg-blue">
+  <div class="va-wrap">
+    <p class="va-words">Design it once. Print it from any page in APEX. No BI Publisher, no Word templates, no print server.</p>
+    <div class="va-callout-foot">
+      <a class="va-qbtn" href="#va-get">Request VinAura <span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
+      <ul>
+        <li><svg><use href="#va-i-check"/></svg>The designer application</li>
+        <li><svg><use href="#va-i-check"/></svg>The PL/SQL engine and API</li>
+        <li><svg><use href="#va-i-check"/></svg>Demo screens and sample reports</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="va-faq" id="va-faq">
+  <div class="va-wrap va-faq-grid">
+    <div class="va-head va-reveal">
+      <span class="va-eyebrow">FAQ</span>
+      <h2 class="va-h2">Frequently asked</h2>
+      <p class="va-lead">Anything else? Ask in the request form and we'll answer personally.</p>
+    </div>
+    <div class="va-reveal">
+      <details open><summary>Do I need BI Publisher, a print server or APEX Office Print?</summary><p>No. VinAura makes the PDF in PL/SQL inside your database. There is nothing to install or run beside Oracle and APEX.</p></details>
+      <details><summary>Which versions of Oracle and APEX does it need?</summary><p>The engine and the API need Oracle Database 19c or later with Oracle APEX. The designer application is an Oracle APEX 26.1 export, so the workspace where you design needs APEX 26.1 or later.</p></details>
+      <details><summary>Does it work on Autonomous Database?</summary><p>It is built for it: plain PL/SQL and SQL, with no operating-system access, no Java, no files and no network calls, so it uses nothing that Autonomous Database restricts.</p></details>
+      <details><summary>Can my page items be used in the queries?</summary><p>Yes. A bind variable such as :P11_INVOICE_ID takes the value of that page item from session state, or the value you pass to pdf_api.generate.</p></details>
+      <details><summary>Where are the layouts kept?</summary><p>In tables of your schema: PDF_REPORTS (the layout, as JSON) and PDF_QUERIES. A report can be exported as JSON and imported into another environment.</p></details>
+      <details><summary>Which fonts and characters does it print?</summary><p>Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier, in regular, bold and italic, with the characters of Western European languages. The rupee sign prints as Rs.</p></details>
+      <details><summary>How fast is it, and how big are the files?</summary><p>A one-page invoice with a logo takes about 30 ms and is about 35 KB. A batch of invoices is one call and one file.</p></details>
+      <details><summary>How much does it cost?</summary><p>The price is on request. Send the form with the licence you need and you'll receive a PayPal invoice within one business day; the download follows the payment.</p></details>
+      <details><summary>What do I receive?</summary><p>A zip with the APEX application export, the SQL scripts of the tables and packages, the demo data and sample reports, and the installation guide.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Request ============ -->
+<section class="va-get va-slab va-bg-paper" id="va-get">
+  <div class="va-wrap va-get-grid">
+    <div class="va-reveal">
+      <span class="va-eyebrow">Request VinAura</span>
+      <h2 class="va-h2">Get VinAura for your APEX applications</h2>
+      <p class="va-lead">Tell us who you are and which licence you need. We read every request ourselves.</p>
+      <ol class="va-steps">
+        <li><span><b>Send the request</b>Your name, your company and the licence you need.</span></li>
+        <li><span><b>A PayPal invoice</b>Within one business day, with your company details on it.</span></li>
+        <li><span><b>Download VinAura</b>After the payment you receive the zip and the installation guide.</span></li>
+      </ol>
+      <div class="va-price">
+        <span class="va-ico" style="--c:var(--teal)"><svg><use href="#va-i-tag"/></svg></span>
+        <div><b>Price on request</b><p>For one developer, a team or the whole company. Ask about installation help and custom reports too.</p></div>
+      </div>
+    </div>
+
+    <div class="va-form va-reveal" id="va-form-card">
+      <h3>Request VinAura</h3>
+      <p>Fields marked <span style="color:var(--rose)">*</span> are required.</p>
+      <form id="va-form" novalidate>
+        <input type="hidden" name="product" value="VinAura">
+        <div class="va-fields">
+          <div class="va-field"><label for="va-name">Your name <i>*</i></label><input id="va-name" name="name" type="text" autocomplete="name" required maxlength="100"><span class="va-err"></span></div>
+          <div class="va-field"><label for="va-role">Your role</label>
+            <select id="va-role" name="role"><option value="">Select&hellip;</option><option>APEX developer</option><option>Team lead / architect</option><option>IT manager</option><option>Consultant / partner</option><option>Business owner</option><option>Other</option></select></div>
+          <div class="va-field va-full"><label for="va-company">Company <i>*</i></label><input id="va-company" name="company" type="text" autocomplete="organization" required maxlength="150"><span class="va-err"></span></div>
+          <div class="va-field"><label for="va-email">E-mail <i>*</i></label><input id="va-email" name="email" type="email" autocomplete="email" required maxlength="150"><span class="va-err"></span></div>
+          <div class="va-field"><label for="va-phone">Phone</label><input id="va-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20"><span class="va-err"></span></div>
+          <div class="va-field"><label for="va-country">Country</label><input id="va-country" name="country" type="text" autocomplete="country-name" maxlength="80"></div>
+          <div class="va-field"><label for="va-licence">Licence</label>
+            <select id="va-licence" name="licence"><option>One developer</option><option>A team (up to 5 developers)</option><option>The whole company</option><option>Not sure yet</option></select></div>
+          <div class="va-field va-full"><label for="va-interest">I'm interested in</label>
+            <select id="va-interest" name="interest"><option>Buying VinAura</option><option>A live demo first</option><option>Help with installation</option><option>Custom report design</option><option>Something else</option></select></div>
+          <div class="va-field va-full"><label for="va-message">Anything else we should know?</label><textarea id="va-message" name="message" maxlength="3000" placeholder="Your Oracle and APEX versions, the reports you want to make&hellip;"></textarea></div>
+          <div class="va-hp" aria-hidden="true"><label for="va-website">Website</label><input id="va-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+        </div>
+        <div class="va-form-foot">
+          <button class="va-btn va-btn-primary" type="submit"><span class="va-spin"></span><span class="va-btn-text">Request VinAura</span><svg><use href="#va-i-arrow"/></svg></button>
+          <small>We only use your details to reply to this request. No newsletters.</small>
+        </div>
+        <div class="va-msg" role="alert"></div>
+      </form>
+      <div class="va-done" role="status">
+        <div class="va-shield"><svg><use href="#va-i-check"/></svg></div>
+        <h3>Thank you, we've got it</h3>
+        <p>Your request is on its way. You'll hear from us within one business day.</p>
+        <div class="va-cta" style="justify-content:center"><a class="va-btn va-btn-ghost" href="#va-tutorial"><svg><use href="#va-i-book"/></svg> Read the tutorial meanwhile</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="va-foot va-slab">
+  <div class="va-wrap">
+    <div class="va-foot-top">
+      <p>VinAura is the visual PDF report designer for Oracle APEX: invoices, statements and labels, designed on a canvas and made in PL/SQL.</p>
+      <nav><a href="#va-how">How it works</a><a href="#va-features">Features</a><a href="#va-pdfs">Sample PDFs</a><a href="#va-tutorial">Tutorial</a><a href="#va-faq">FAQ</a><a href="#va-get">Request VinAura</a></nav>
+    </div>
+    <div class="va-foot-mark" aria-hidden="true"><span>VinAura</span></div>
+    <div class="va-foot-bot"><span>VinAura &middot; Visual PDF Report Designer for Oracle APEX</span><span>Built by <a href="https://vinish.dev" target="_blank" rel="noopener">Vinish Kapoor</a></span></div>
+  </div>
+</footer>
+
+<dialog class="va-lb" aria-label="Enlarged picture"><button type="button" class="va-lb-close" aria-label="Close"><svg><use href="#va-i-close"/></svg></button><img src="" alt=""><p></p></dialog>
+
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "SoftwareApplication",
+   "name": "VinAura",
+   "alternateName": "VinAura - Visual PDF Report Designer for Oracle APEX",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "PDF report designer for Oracle APEX",
+   "operatingSystem": "Oracle Database with Oracle APEX",
+   "description": "VinAura is a visual PDF report designer for Oracle APEX. Design invoices, statements and labels on a canvas, bind them to SQL queries and page items, and get the PDF as a BLOB with one PL/SQL call. Pure PL/SQL: no BI Publisher, no print server.",
+   "url": "https://vinish.dev/vinaura/",
+   "image": "https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp",
+   "screenshot": [
+    "https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp",
+    "https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-queries.webp",
+    "https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-preview.webp",
+    "https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp"
+   ],
+   "featureList": [
+    "Visual layout designer with bands",
+    "Up to ten SQL queries per report with APEX page item binds",
+    "Tables that flow over pages with repeated headers",
+    "Totals, groups and sub-totals",
+    "Amount in words",
+    "Code 128 barcodes and label sheets",
+    "Batch documents",
+    "Any page size, portrait or landscape",
+    "Logos and images",
+    "Export and import as JSON"
+   ],
+   "offers": {
+    "@type": "Offer",
+    "availability": "https://schema.org/InStock",
+    "url": "https://vinish.dev/vinaura/#va-get",
+    "description": "Price on request"
+   },
+   "author": {
+    "@type": "Person",
+    "name": "Vinish Kapoor",
+    "url": "https://vinish.dev"
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Do I need BI Publisher, a print server or APEX Office Print?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. VinAura makes the PDF in PL/SQL inside your database. There is nothing to install or run beside Oracle and APEX."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which versions of Oracle and APEX does it need?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The engine and the API need Oracle Database 19c or later with Oracle APEX. The designer application is an Oracle APEX 26.1 export, so the workspace where you design needs APEX 26.1 or later."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does it work on Autonomous Database?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It is built for it: plain PL/SQL and SQL, with no operating-system access, no Java, no files and no network calls, so it uses nothing that Autonomous Database restricts."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can my page items be used in the queries?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes. A bind variable such as :P11_INVOICE_ID takes the value of that page item from session state, or the value you pass to pdf_api.generate."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Where are the layouts kept?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "In tables of your schema: PDF_REPORTS (the layout, as JSON) and PDF_QUERIES. A report can be exported as JSON and imported into another environment."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which fonts and characters does it print?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier, in regular, bold and italic, with the characters of Western European languages. The rupee sign prints as Rs."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How fast is it, and how big are the files?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A one-page invoice with a logo takes about 30 ms and is about 35 KB. A batch of invoices is one call and one file."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "How much does it cost?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The price is on request. Send the form with the licence you need and you'll receive a PayPal invoice within one business day; the download follows the payment."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "What do I receive?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "A zip with the APEX application export, the SQL scripts of the tables and packages, the demo data and sample reports, and the installation guide."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+
+<script>
+(function(){
+  var root = document.getElementById('vinaura-lp');
+  if (!root) return;
+  root.classList.add('va-js');
+  /* sit flush under the site header: clear the top spacing WordPress wrappers add above this block,
+     climbing only while the block is the first thing inside each wrapper */
+  (function(){
+    var el = root;
+    root.style.setProperty('margin-top', '0', 'important');
+    var visible = function(n){ return n.nodeType === 1 && !/^(SCRIPT|STYLE|LINK|META|NOSCRIPT|TEMPLATE)$/.test(n.tagName) && (n.offsetHeight > 0 || n.offsetWidth > 0); };
+    while (el.parentElement && el.parentElement !== document.body && el.parentElement !== document.documentElement) {
+      var p = el.parentElement, first = null;
+      for (var i = 0; i < p.children.length; i++) { if (visible(p.children[i])) { first = p.children[i]; break; } }
+      if (first !== el) { el.style.setProperty('margin-top', '0', 'important'); break; }
+      el.style.setProperty('margin-top', '0', 'important');
+      p.style.setProperty('padding-top', '0', 'important');
+      p.style.setProperty('border-top-width', '0', 'important');
+      el = p;
+    }
+    el.style.setProperty('margin-top', '0', 'important');
+    var bs = getComputedStyle(document.body);
+    if (parseFloat(bs.marginTop) || parseFloat(bs.marginLeft)) document.body.style.setProperty('margin', '0', 'important');
+  })();
+
+  /* full width without the scrollbar, wherever the theme put the block */
+  function fit(){
+    var cw = document.documentElement.clientWidth, st = root.style, imp = 'important';
+    st.setProperty('position', 'relative', imp);
+    st.setProperty('left', '0', imp); st.setProperty('right', 'auto', imp);
+    st.setProperty('margin-left', '0', imp); st.setProperty('margin-right', '0', imp);
+    st.setProperty('max-width', '100vw', imp);
+    st.setProperty('width', cw + 'px', imp);
+    var x = root.getBoundingClientRect().left;
+    st.setProperty('margin-left', (-x) + 'px', imp);
+  }
+  fit(); window.addEventListener('resize', fit); window.addEventListener('load', fit);
+  if ('ResizeObserver' in window && root.parentElement) new ResizeObserver(function(){ fit(); }).observe(root.parentElement);
+  var $ = function(s, c){ return (c || root).querySelector(s); };
+  var $$ = function(s, c){ return Array.prototype.slice.call((c || root).querySelectorAll(s)); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* smooth scrolling that clears a sticky site header */
+  root.addEventListener('click', function(e){
+    var a = e.target.closest('a[href^="#va-"]');
+    if (!a) return;
+    var t = document.getElementById(a.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    var y = t.getBoundingClientRect().top + window.pageYOffset - 96;
+    window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+    if (a.getAttribute('href') === '#va-get') setTimeout(function(){ var n = $('#va-name'); if (n) n.focus({ preventScroll: true }); }, 650);
+  });
+
+  /* header: mega panels that grow out of the bar, menu button, shadow once scrolled */
+  var nav = $('.va-nav'), bar = $('.va-bar', nav), burger = $('.va-burger', nav);
+  var panels = $$('.va-panel', nav), triggers = $$('.va-nl[data-panel]', nav), current = null, hoverAt = 0, closeT = 0;
+  var hover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  function show(name){
+    clearTimeout(closeT);
+    current = name;
+    bar.classList.toggle('va-open', !!name);
+    if (name) panels.forEach(function(p){ p.classList.toggle('va-on', p.getAttribute('data-panel') === name); });
+    triggers.forEach(function(t){ var on = t.getAttribute('data-panel') === name; t.classList.toggle('va-act', on); t.setAttribute('aria-expanded', on); });
+    burger.classList.toggle('va-x', name === 'all');
+    burger.setAttribute('aria-expanded', name === 'all');
+    burger.setAttribute('aria-label', name === 'all' ? 'Close menu' : 'Open menu');
+  }
+  panels.forEach(function(p){ $$('li, .va-pgroup h4', p).forEach(function(li, i){ li.style.setProperty('--d', i); }); });
+  triggers.forEach(function(t){
+    var name = t.getAttribute('data-panel');
+    t.addEventListener('click', function(e){ e.stopPropagation(); if (Date.now() - hoverAt < 500) return; show(current === name ? null : name); });
+    if (hover) t.addEventListener('mouseenter', function(){ if (current !== name) { hoverAt = Date.now(); show(name); } });
+  });
+  if (hover) {
+    bar.addEventListener('mouseenter', function(){ clearTimeout(closeT); });
+    bar.addEventListener('mouseleave', function(){ if (current && current !== 'all') closeT = setTimeout(function(){ show(null); }, 180); });
+  }
+  burger.addEventListener('click', function(e){ e.stopPropagation(); show(current === 'all' ? null : 'all'); });
+  $$('.va-panel a', nav).forEach(function(a){ a.addEventListener('click', function(){ show(null); }); });
+  document.addEventListener('click', function(e){ if (current && !bar.contains(e.target)) show(null); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && current) show(null); });
+  var onScroll = function(){ nav.classList.toggle('va-scrolled', window.pageYOffset > 24); };
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* reveal on scroll */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('va-seen'); io.unobserve(en.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    $$('.va-reveal').forEach(function(el, i){ el.style.transitionDelay = (i % 3) * 80 + 'ms'; io.observe(el); });
+  } else {
+    $$('.va-reveal').forEach(function(el){ el.classList.add('va-seen'); });
+  }
+
+  /* "Inside VinAura" showcase: rotates between the screens until someone picks one */
+  var showcase = $('.va-show');
+  if (showcase) {
+    var tabs = $$('.va-seg button', showcase), shots = $$('.va-show-stage img', showcase), cap = $('.va-show-cap', showcase), ttl = $('.va-show-title', showcase);
+    var seg = $('.va-seg', showcase);
+    var cur = 0, shotTimer = 0, autoOn = !reduce, inView = false, DUR = 5500;
+    var go = function(i){
+      cur = i;
+      shots.forEach(function(im, k){ im.classList.toggle('va-on', k === i); });
+      tabs.forEach(function(t, k){ t.classList.toggle('va-on', k === i); t.setAttribute('aria-selected', k === i); });
+      if (ttl) ttl.textContent = shots[i].getAttribute('data-title');
+      if (cap) cap.textContent = shots[i].getAttribute('data-cap');
+      var t = tabs[i]; if (seg && seg.scrollWidth > seg.clientWidth) seg.scrollTo({ left: t.offsetLeft - (seg.clientWidth - t.offsetWidth) / 2, behavior: reduce ? 'auto' : 'smooth' });
+    };
+    var restartBar = function(){ var b = $('.va-show-bar i', showcase); showcase.classList.remove('va-auto'); void b.offsetWidth; if (autoOn && inView) showcase.classList.add('va-auto'); };
+    var tick = function(){ clearTimeout(shotTimer); if (!autoOn || !inView) return; restartBar(); shotTimer = setTimeout(function(){ go((cur + 1) % shots.length); tick(); }, DUR); };
+    showcase.style.setProperty('--dur', DUR + 'ms');
+    tabs.forEach(function(t){ t.addEventListener('click', function(){ autoOn = false; clearTimeout(shotTimer); showcase.classList.remove('va-auto'); go(+t.getAttribute('data-show')); }); });
+    $$('.va-show-stage img', showcase).forEach(function(im){ im.setAttribute('data-zoom', im.getAttribute('src')); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(en){ inView = en[0].isIntersecting; if (inView) tick(); else { clearTimeout(shotTimer); showcase.classList.remove('va-auto'); } }, { threshold: .4 }).observe(showcase);
+    }
+  }
+
+  /* slabs settle into place as they arrive */
+  if ('IntersectionObserver' in window && !reduce) {
+    var slabIO = new IntersectionObserver(function(en){ en.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('va-in'); slabIO.unobserve(e.target); } }); }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+    $$('.va-slab').forEach(function(el){ slabIO.observe(el); });
+  } else { $$('.va-slab').forEach(function(el){ el.classList.add('va-in'); }); }
+
+  /* the call-out lights up word by word while it scrolls through */
+  var wordsEl = $('.va-words');
+  if (wordsEl) {
+    var parts = wordsEl.textContent.trim().split(/\s+/);
+    wordsEl.innerHTML = parts.map(function(w){ return '<span>' + w + '</span>'; }).join(' ');
+    var spans = $$('span', wordsEl), ticking = false;
+    var paint = function(){
+      ticking = false;
+      var r = wordsEl.getBoundingClientRect(), vh = window.innerHeight;
+      var p = reduce ? 1 : Math.max(0, Math.min(1, (vh * 0.9 - r.top) / (vh * 0.55 + r.height * 0.6)));
+      var lit = Math.round(p * spans.length);
+      spans.forEach(function(sp, i){ sp.classList.toggle('va-lit', i < lit); });
+    };
+    window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+    paint();
+  }
+
+  /* hero: fawn on load, then brand blue */
+  var heroEl = $('.va-hero');
+  if (heroEl) setTimeout(function(){ heroEl.classList.add('va-lit'); }, reduce ? 0 : 650);
+
+  /* footer word mark: sized to run the full width of the footer */
+  var mark = $('.va-foot-mark'), markText = mark && $('span', mark);
+  if (markText) {
+    var FIT = 0.99;
+    var fitMark = function(){
+      mark.style.fontSize = '100px';
+      var w = markText.getBoundingClientRect().width, box = mark.getBoundingClientRect().width;
+      if (w && box) mark.style.fontSize = (100 * box * FIT / w) + 'px';
+    };
+    var offBy = function(){ return Math.abs(markText.getBoundingClientRect().width - mark.getBoundingClientRect().width * FIT); };
+    fitMark();
+    window.addEventListener('resize', fitMark);
+    window.addEventListener('load', fitMark);
+    if (document.fonts) {
+      if (document.fonts.load) document.fonts.load('600 100px "Inter Tight"').then(fitMark, function(){});
+      if (document.fonts.ready) document.fonts.ready.then(fitMark);
+    }
+    if ('ResizeObserver' in window) new ResizeObserver(function(){ if (offBy() > 2) fitMark(); }).observe(markText);
+  }
+
+  /* code blocks: a light PL/SQL colouring and a copy button */
+  var KW = 'select|from|where|join|on|and|or|order|by|group|as|into|update|set|insert|values|delete|declare|begin|end|is|null|not|in|create|grant|execute|to|synonym|for|then|if|else|return|loop|distinct|round|nvl';
+  var kwRe = new RegExp('^(' + KW + ')$', 'i');
+  var esc = function(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+  function highlight(src){
+    // comments, strings, binds, numbers and words, in one pass so nothing is coloured twice
+    var re = /(--[^\n]*)|('(?:[^']|'')*')|(:[A-Za-z][\w$#]*)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][\w$#]*)/g, out = '', last = 0, m;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      if (m[1]) out += '<span class="c">' + esc(m[1]) + '</span>';
+      else if (m[2]) out += '<span class="s">' + esc(m[2]) + '</span>';
+      else if (m[3]) out += '<span class="b">' + esc(m[3]) + '</span>';
+      else if (m[4]) out += '<span class="n">' + m[4] + '</span>';
+      else out += kwRe.test(m[5]) ? '<span class="k">' + m[5] + '</span>' : esc(m[5]);
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  $$('.va-code pre code').forEach(function(c){
+    var bar = c.closest('.va-code').querySelector('.va-code-bar span');
+    if (bar && /url|attributes/i.test(bar.textContent)) return;   // a URL is not PL/SQL
+    c.innerHTML = highlight(c.textContent);
+  });
+  $$('.va-copy').forEach(function(b){
+    b.addEventListener('click', function(){
+      var text = b.closest('.va-code').querySelector('pre').textContent, label = $('span', b);
+      var done = function(){ b.classList.add('va-done'); label.textContent = 'Copied'; setTimeout(function(){ b.classList.remove('va-done'); label.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, function(){});
+      else {
+        var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch(_){} document.body.removeChild(ta);
+      }
+    });
+  });
+
+  /* lightbox for screenshots and PDF pages */
+  var lb = $('.va-lb');
+  if (lb && lb.showModal) {
+    var lbImg = $('img', lb), lbCap = $('p', lb);
+    root.addEventListener('click', function(e){
+      var z = e.target.closest('[data-zoom]');
+      if (!z || !root.contains(z)) return;
+      e.preventDefault();
+      var img = z.tagName === 'IMG' ? z : $('img', z);
+      lbImg.src = z.getAttribute('data-zoom');
+      lbImg.alt = img ? img.alt : '';
+      lbCap.textContent = z.getAttribute('data-cap') || '';
+      lb.showModal();
+    });
+    $('.va-lb-close', lb).addEventListener('click', function(){ lb.close(); });
+    lb.addEventListener('click', function(e){ if (e.target === lb) lb.close(); });
+  }
+
+  /* the form */
+  var form = $('#va-form'), card = $('#va-form-card'), msg = $('.va-msg', form), btn = $('button[type=submit]', form);
+  var opened = Date.now();
+  var rules = {
+    name: function(v){ return v.length >= 2 || 'Please enter your name.'; },
+    company: function(v){ return v.length >= 2 || 'Please enter your company.'; },
+    email: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || 'Please enter a valid e-mail address.'; },
+    phone: function(v){ return !v || v.replace(/\D/g, '').length >= 7 || 'Please check the phone number, or leave it empty.'; }
+  };
+  function check(name){
+    var el = form.elements[name], field = el.closest('.va-field'), ok = rules[name](el.value.trim());
+    field.classList.toggle('va-bad', ok !== true);
+    $('.va-err', field).textContent = ok === true ? '' : ok;
+    return ok === true;
+  }
+  Object.keys(rules).forEach(function(n){
+    form.elements[n].addEventListener('blur', function(){ if (this.value) check(n); });
+    form.elements[n].addEventListener('input', function(){ if (this.closest('.va-field').classList.contains('va-bad')) check(n); });
+  });
+  function mailtoFallback(data){
+    var to = root.getAttribute('data-fallback-email');
+    var body = Object.keys(data).filter(function(k){ return k !== 'website' && k !== 'elapsed' && data[k]; })
+      .map(function(k){ return k.charAt(0).toUpperCase() + k.slice(1) + ': ' + data[k]; }).join('\n');
+    return 'mailto:' + to + '?subject=' + encodeURIComponent('VinAura request - ' + (data.company || '')) + '&body=' + encodeURIComponent(body);
+  }
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    msg.className = 'va-msg'; msg.textContent = '';
+    var bad = Object.keys(rules).filter(function(n){ return !check(n); });
+    if (bad.length) { form.elements[bad[0]].focus(); return; }
+    var data = {};
+    Array.prototype.forEach.call(form.elements, function(el){ if (el.name) data[el.name] = el.value.trim(); });
+    data.elapsed = Math.round((Date.now() - opened) / 1000);
+    btn.disabled = true; btn.classList.add('va-busy'); $('.va-btn-text', btn).textContent = 'Sending…';
+    fetch(root.getAttribute('data-endpoint'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), credentials: 'same-origin' })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (!r.ok || !j.ok) throw new Error(j.message || 'failed'); }); })
+      .then(function(){ card.classList.add('va-sent'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); })
+      .catch(function(err){
+        msg.className = 'va-msg va-err-box';
+        var known = err && err.message && err.message !== 'failed' && !/fetch|network|JSON/i.test(err.message);
+        var to = root.getAttribute('data-fallback-email');
+        msg.innerHTML = (known ? '' : 'Sorry, the form could not be sent just now. Please try again in a moment.') + '<span></span>' + (to ? ' <a href="' + mailtoFallback(data) + '">Or send it by e-mail</a>.' : '');
+        if (known) msg.querySelector('span').textContent = err.message;
+      })
+      .then(function(){ btn.disabled = false; btn.classList.remove('va-busy'); $('.va-btn-text', btn).textContent = 'Request VinAura'; });
+  });
+})();
+</script>
+</div>
