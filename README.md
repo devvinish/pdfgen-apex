@@ -10,6 +10,11 @@ l_pdf := pdfgen.pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', 10
 pdfgen.pdf_api.download('INVOICE');                                            -- straight to the browser
 ```
 
+## Installing
+
+What the database and APEX need for development and production, with or without the demo tables and data:
+**[docs/INSTALL.md](docs/INSTALL.md)**.
+
 ## What is where
 
 | | |
