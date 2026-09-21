@@ -232,3 +232,12 @@
   .pdfd-main { grid-template-columns: 240px minmax(0, 1fr) 270px; }
   .pdfd-btn-label { display: none; }
 }
+
+/* toolbar tooltips (bindTips) */
+.pdfd-tip { position: fixed; z-index: 3000; max-width: 300px; padding: 7px 10px; border-radius: 6px;
+  background: #1d2530; color: #fff; font-size: 12px; line-height: 1.4; box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  pointer-events: none; opacity: 0; transform: translateY(-2px); transition: opacity .08s, transform .08s; }
+.pdfd-tip.is-on { opacity: 1; transform: none; }
+.pdfd-tip strong { display: block; margin-bottom: 2px; }
+.pdfd-tip span { color: #d3dae4; }
+.pdfd-tb-caption { font-size: 11px; font-weight: 600; color: var(--pd-muted); text-transform: uppercase; letter-spacing: .04em; margin: 0 4px 0 2px; align-self: center; }

@@ -30,16 +30,18 @@ window.pdfd = (function ($) {
   };
   var MASKS = ['FM999G999G990D00', 'FM999G999G990', 'FM990D00', 'FM990D0', 'DD-MON-YYYY', 'DD-Mon-YYYY',
     'DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD', 'DD-MON-YYYY HH24:MI', 'fmMonth DD, YYYY'];
+  // type, name, icon, what it is for (shown on hover)
   var PALETTE = [
-    ['text', 'Text', 'fa-font'],
-    ['box', 'Box', 'fa-square-o'],
-    ['rbox', 'Rounded box', 'fa-square-o pdfd-rounded-ico'],
-    ['ellipse', 'Circle / ellipse', 'fa-circle-o'],
-    ['hline', 'Horizontal line', 'fa-minus'],
-    ['vline', 'Vertical line', 'fa-minus fa-rotate-90'],
-    ['image', 'Image', 'fa-image'],
-    ['table', 'Table (rows of a query)', 'fa-table'],
-    ['barcode', 'Barcode (Code 128)', 'fa-barcode']
+    ['text', 'Text / Field', 'fa-font',
+     'Fixed text, a field of a query, or both: "Invoice No.", {Q1.INVOICE_NO}, "Invoice No. {Q1.INVOICE_NO}". Fonts, colours, alignment, border and background.'],
+    ['box', 'Box', 'fa-square-o', 'A rectangle: a frame or a coloured background behind other elements.'],
+    ['rbox', 'Rounded box', 'fa-square-o pdfd-rounded-ico', 'A rectangle with rounded corners.'],
+    ['ellipse', 'Circle / ellipse', 'fa-circle-o', 'A circle or an ellipse, e.g. a PAID stamp.'],
+    ['hline', 'Horizontal line', 'fa-minus', 'A horizontal line: a separator or an underline.'],
+    ['vline', 'Vertical line', 'fa-minus fa-rotate-90', 'A vertical line.'],
+    ['image', 'Image', 'fa-image', 'A logo, a stamp or a signature you upload, or an image from a BLOB column.'],
+    ['table', 'Table', 'fa-table', 'The rows of a query (e.g. the lines of an invoice): columns, totals, groups. It continues on the next pages.'],
+    ['barcode', 'Barcode', 'fa-barcode', 'A Code 128 barcode of fixed text or a field, e.g. {Q1.SKU}.']
   ];
 
   var S = null;          // the state of the designer
@@ -216,19 +218,20 @@ window.pdfd = (function ($) {
 
     var tb = h('div', { class: 'pdfd-toolbar', role: 'toolbar', 'aria-label': 'Designer toolbar' });
     els.title = h('div', { class: 'pdfd-title' });
-    tb.appendChild(h('a', { class: 'pdfd-btn pdfd-btn--quiet', href: S.opts.listUrl || '#', title: 'Back to the reports' }, [icon('fa-chevron-left')]));
+    tb.appendChild(h('a', { class: 'pdfd-btn pdfd-btn--quiet', href: S.opts.listUrl || '#', 'data-tip': 'Back to the reports|Unsaved changes are asked about first.', 'aria-label': 'Back to the reports' }, [icon('fa-chevron-left')]));
     tb.appendChild(els.title);
-    els.saveBtn = tbtn('fa-save', 'Save', save, 'Save (Ctrl+S)', 'pdfd-btn--hot');
+    els.saveBtn = tbtn('fa-save', 'Save', save, 'Save|Saves the layout and the queries (Ctrl+S).', 'pdfd-btn--hot');
     tb.appendChild(els.saveBtn);
-    tb.appendChild(tbtn('fa-file-pdf-o', 'Preview', preview, 'Preview the PDF with the test parameters (Ctrl+P)'));
-    tb.appendChild(tbtn('fa-file-o', 'Page', pageSetup, 'Page size, orientation and margins'));
+    tb.appendChild(tbtn('fa-file-pdf-o', 'Preview', preview, 'Preview|Makes the PDF with the test values of the Parameters tab; nothing needs saving first (Ctrl+P).'));
+    tb.appendChild(tbtn('fa-file-o', 'Page', pageSetup, 'Page setup|Page size (A4, Letter, custom ...), portrait or landscape, margins; for labels the label size.'));
     tb.appendChild(sep());
-    tb.appendChild(tbtn('fa-undo', null, undo, 'Undo (Ctrl+Z)'));
-    tb.appendChild(tbtn('fa-repeat', null, redo, 'Redo (Ctrl+Y)'));
+    tb.appendChild(tbtn('fa-undo', null, undo, 'Undo|Ctrl+Z'));
+    tb.appendChild(tbtn('fa-repeat', null, redo, 'Redo|Ctrl+Y'));
     tb.appendChild(sep());
     var pal = h('div', { class: 'pdfd-palette', role: 'group', 'aria-label': 'Add an element' });
+    pal.appendChild(h('span', { class: 'pdfd-tb-caption', text: 'Add', 'aria-hidden': 'true' }));
     PALETTE.forEach(function (p) {
-      var b = tbtn(p[2], null, function () { addElement(p[0]); }, 'Add: ' + p[1] + ' (or drag it onto a band)');
+      var b = tbtn(p[2], null, function () { addElement(p[0]); }, p[1] + '|' + p[3] + ' Click: add it to the selected band. Or drag it onto a band.');
       b.setAttribute('draggable', 'true');
       b.addEventListener('dragstart', function (ev) {
         ev.dataTransfer.setData('text/plain', JSON.stringify({ kind: 'new', type: p[0] }));
@@ -242,20 +245,23 @@ window.pdfd = (function ($) {
     [['left', 'fa-align-left', 'Align left edges'], ['center', 'fa-align-center', 'Align centres'],
       ['right', 'fa-align-right', 'Align right edges'], ['top', 'fa-long-arrow-up', 'Align top edges'],
       ['middle', 'fa-arrows-v', 'Align middles'], ['bottom', 'fa-long-arrow-down', 'Align bottom edges'],
-      ['width', 'fa-arrows-h', 'Same width as the first selected'], ['height', 'fa-text-height', 'Same height as the first selected']
-    ].forEach(function (a) { al.appendChild(tbtn(a[1], null, function () { align(a[0]); }, a[2])); });
+      ['width', 'fa-arrows-h', 'Same width'], ['height', 'fa-text-height', 'Same height']
+    ].forEach(function (a) {
+      al.appendChild(tbtn(a[1], null, function () { align(a[0]); }, a[2] + '|Select two or more elements first (Shift+click); ' +
+        (a[0] === 'width' || a[0] === 'height' ? 'they take the size of the first one.' : 'they line up with each other.')));
+    });
     tb.appendChild(al);
     tb.appendChild(sep());
-    tb.appendChild(tbtn('fa-clone', null, duplicate, 'Duplicate (Ctrl+D)'));
-    tb.appendChild(tbtn('fa-trash-o', null, removeSelected, 'Delete (Del)'));
+    tb.appendChild(tbtn('fa-clone', null, duplicate, 'Duplicate|A copy of the selected elements (Ctrl+D).'));
+    tb.appendChild(tbtn('fa-trash-o', null, removeSelected, 'Delete|Removes the selected elements (Del).'));
     tb.appendChild(h('span', { class: 'pdfd-spacer' }));
     els.status = h('span', { class: 'pdfd-status', 'aria-live': 'polite' });
     tb.appendChild(els.status);
     tb.appendChild(tbtn('fa-search-minus', null, function () { zoom(-0.1); }, 'Zoom out'));
-    els.zoom = h('button', { type: 'button', class: 'pdfd-btn pdfd-zoom', title: 'Zoom to 100%', onclick: function () { S.zoom = 1; renderCanvas(); updateZoom(); } });
+    els.zoom = h('button', { type: 'button', class: 'pdfd-btn pdfd-zoom', 'data-tip': 'Zoom to 100%', 'aria-label': 'Zoom to 100%', onclick: function () { S.zoom = 1; renderCanvas(); updateZoom(); } });
     tb.appendChild(els.zoom);
     tb.appendChild(tbtn('fa-search-plus', null, function () { zoom(0.1); }, 'Zoom in'));
-    els.snapBtn = tbtn('fa-th', null, function () { S.snap = !S.snap; els.snapBtn.classList.toggle('is-on', S.snap); renderCanvas(); }, 'Snap to grid');
+    els.snapBtn = tbtn('fa-th', null, function () { S.snap = !S.snap; els.snapBtn.classList.toggle('is-on', S.snap); renderCanvas(); }, 'Snap to grid|Elements move and resize in steps of 5 pt. Click to turn it on or off.');
     els.snapBtn.classList.toggle('is-on', S.snap);
     tb.appendChild(els.snapBtn);
 
@@ -276,9 +282,41 @@ window.pdfd = (function ($) {
     });
   }
 
-  function tbtn(ic, label, fn, title, extra) {
-    return h('button', { type: 'button', class: 'pdfd-btn' + (extra ? ' ' + extra : ''), title: title || label, 'aria-label': title || label, onclick: fn },
+  // tip: 'Name' or 'Name|what it does' - shown at once on hover and on keyboard focus (see showTip)
+  function tbtn(ic, label, fn, tip, extra) {
+    var t = tip || label;
+    return h('button', { type: 'button', class: 'pdfd-btn' + (extra ? ' ' + extra : ''), 'data-tip': t,
+      'aria-label': t.replace('|', ': '), onclick: fn },
       [icon(ic), label ? h('span', { class: 'pdfd-btn-label', text: label }) : null]);
+  }
+
+  // the tooltip of the toolbar: one element, placed under the button the mouse or the keyboard is on
+  function bindTips() {
+    var tip = h('div', { class: 'pdfd-tip', role: 'tooltip', 'aria-hidden': 'true' });
+    root.appendChild(tip);
+    function show(ev) {
+      var b = ev.target.closest && ev.target.closest('[data-tip]');
+      if (!b || !root.contains(b)) { return; }
+      var parts = b.getAttribute('data-tip').split('|');
+      tip.innerHTML = '';
+      tip.appendChild(h('strong', { text: parts[0] }));
+      if (parts[1]) { tip.appendChild(h('span', { text: parts[1] })); }
+      var r = b.getBoundingClientRect();
+      tip.classList.add('is-on');
+      var left = Math.min(Math.max(8, r.left + r.width / 2 - tip.offsetWidth / 2), window.innerWidth - tip.offsetWidth - 8);
+      tip.style.left = left + 'px';
+      tip.style.top = (r.bottom + 6) + 'px';
+    }
+    function hide(ev) {
+      var b = ev.target.closest && ev.target.closest('[data-tip]');
+      if (b && ev.relatedTarget && b.contains(ev.relatedTarget)) { return; }
+      tip.classList.remove('is-on');
+    }
+    root.addEventListener('mouseover', show);
+    root.addEventListener('mouseout', hide);
+    root.addEventListener('focusin', show);
+    root.addEventListener('focusout', hide);
+    root.addEventListener('mousedown', function () { tip.classList.remove('is-on'); });
   }
   function sep() { return h('span', { class: 'pdfd-sep', 'aria-hidden': 'true' }); }
 
@@ -347,8 +385,8 @@ window.pdfd = (function ($) {
       body.appendChild(h('div', { class: 'pdfd-query' }, [
         h('div', { class: 'pdfd-qhead' }, [
           h('span', { class: 'pdfd-alias', text: q.alias }), title,
-          h('button', { type: 'button', class: 'pdfd-btn pdfd-btn--small', title: 'Check the query and read its columns', onclick: function () { describe(q, true); } }, [icon('fa-check')]),
-          h('button', { type: 'button', class: 'pdfd-btn pdfd-btn--small', title: 'Remove ' + q.alias, onclick: function () { removeQuery(idx); } }, [icon('fa-times')])
+          h('button', { type: 'button', class: 'pdfd-btn pdfd-btn--small', 'data-tip': 'Check the query|Reads its columns (the Fields tab) and its bind variables (the Parameters tab).', 'aria-label': 'Check ' + q.alias, onclick: function () { describe(q, true); } }, [icon('fa-check')]),
+          h('button', { type: 'button', class: 'pdfd-btn pdfd-btn--small', 'data-tip': 'Remove ' + q.alias, 'aria-label': 'Remove ' + q.alias, onclick: function () { removeQuery(idx); } }, [icon('fa-times')])
         ]),
         ta, status
       ]));
@@ -914,7 +952,7 @@ window.pdfd = (function ($) {
     var cw = contentWidth();
     var e = { id: newId(), x: spot.x, y: spot.y };
     switch (type) {
-      case 'text': $.extend(e, { type: 'text', w: 140, h: 16, text: 'Text' }); break;
+      case 'text': $.extend(e, { type: 'text', w: 160, h: 16, text: 'Text or {' + firstQueryWithCols() + '.FIELD}' }); break;
       case 'box': $.extend(e, { type: 'box', w: 140, h: 60, borderWidth: 1, borderColor: '#000000' }); break;
       case 'rbox': $.extend(e, { type: 'box', w: 140, h: 60, borderWidth: 1, borderColor: '#000000', radius: 8 }); break;
       case 'ellipse': $.extend(e, { type: 'ellipse', w: 70, h: 44, borderWidth: 1, borderColor: '#000000' }); break;
@@ -1177,7 +1215,16 @@ window.pdfd = (function ($) {
     parent.appendChild(h('div', { class: 'pdfd-field pdfd-field--half' }, [h('label', { text: label }), row]));
   }
 
+  // what the properties panel calls an element: a text holding one field only is "Field Q1.COLUMN"
+  function elementName(e) {
+    var t = (e.text || '').trim();
+    if (e.type === 'text') { return /^\{Q[0-9]+\.[^}|]+(\|[^}]*)?\}$/.test(t) ? 'Field ' + t.slice(1, -1).split('|')[0] : 'Text / Field'; }
+    return { box: e.radius ? 'Rounded box' : 'Box', ellipse: 'Ellipse', line: 'Line', image: 'Image', table: 'Table', barcode: 'Barcode' }[e.type] || e.type;
+  }
+
   function refreshSelected() {
+    var head = els.props.querySelector('.pdfd-props-head strong');
+    if (head && S.sel.length === 1 && find(S.sel[0])) { head.textContent = elementName(find(S.sel[0]).el); }
     // redraw only the selected elements (keeps the focus in the properties)
     S.sel.forEach(function (id) {
       var f = find(id);
@@ -1238,12 +1285,11 @@ window.pdfd = (function ($) {
   }
 
   function elementProps(p, e, bandName) {
-    var names = { text: 'Text', box: e.radius ? 'Rounded box' : 'Box', ellipse: 'Ellipse', line: 'Line', image: 'Image', table: 'Table', barcode: 'Barcode' };
-    p.appendChild(h('div', { class: 'pdfd-props-head' }, [h('strong', { text: names[e.type] || e.type }), h('span', { text: ' in ' + bandLabel(bandName) })]));
+    p.appendChild(h('div', { class: 'pdfd-props-head' }, [h('strong', { text: elementName(e) }), h('span', { text: ' in ' + bandLabel(bandName) })]));
     if (e.type === 'text') {
-      var s = section(p, 'Text');
+      var s = section(p, 'Text and fields');
       field(s, 'Text', e, 'text', 'textarea', { rows: 3 });
-      s.appendChild(h('div', { class: 'pdfd-fhint', text: 'Fixed text and tokens: {Q1.COLUMN}, {PAGE}, {SUM(Q2.AMOUNT)}. Click a field in Fields to insert it here.' }));
+      s.appendChild(h('div', { class: 'pdfd-fhint', text: 'Fixed text, fields and tokens, mixed as you like: Invoice No. {Q1.INVOICE_NO}, Page {PAGE} of {PAGES}, {SUM(Q2.AMOUNT)}. While typing here, click a field in the Fields tab to insert it.' }));
       field(s, 'Format mask', e, 'format', 'text', { list: 'pdfd-masks', placeholder: 'e.g. FM999G990D00', hint: 'For a single token: a number or date format.' });
       fontProps(s, e);
       segField(s, 'Align', e, 'align', [['left', 'fa-align-left', 'Left'], ['center', 'fa-align-center', 'Centre'], ['right', 'fa-align-right', 'Right']], 'left');
@@ -1778,6 +1824,7 @@ window.pdfd = (function ($) {
     };
     try { S.zoom = parseFloat(window.localStorage.getItem('pdfd.zoom')) || 1; } catch (x) { S.zoom = 1; }
     buildShell();
+    bindTips();
     if (!document.getElementById('pdfd-masks')) {
       document.body.appendChild(h('datalist', { id: 'pdfd-masks' }, MASKS.map(function (m) { return h('option', { value: m }); })));
     }

@@ -18,7 +18,7 @@
   <li><strong>Reports &gt; New Report.</strong> Give it a <em>code</em> (for example <code>INVOICE</code>). Your applications call the report by this code.</li>
   <li><strong>Queries</strong> (left panel): write one <code>SELECT</code> for each part of the document, up to 10 (Q1 to Q10). For example, Q1 is the invoice header, Q2 the invoice lines and Q3 the totals. Use your page items as bind variables: <code>where invoice_id = :P11_INVOICE_ID</code>. Click <span class="fa fa-check"></span> to check a query and read its columns.</li>
   <li><strong>Fields</strong>: drag a field onto a band to print it, or onto a table to add a column.</li>
-  <li><strong>Toolbar</strong>: add text, boxes, rounded boxes, circles, lines, images, tables and barcodes. Drag them into place, resize them by their handles, and set their properties on the right.</li>
+  <li><strong>Toolbar</strong> (hover a button to see what it does): add text and fields (<em>Text / Field</em>: fixed text, <code>{Q1.COLUMN}</code>, or both), boxes, rounded boxes, circles, lines, images, tables and barcodes. Drag them into place, resize them by their handles, and set their properties on the right.</li>
   <li><strong>Page</strong>: page size (A4, A3, A5, Letter, Legal, ... or a custom size), portrait or landscape, and margins.</li>
   <li><strong>Parameters</strong>: test values for the bind variables. Then use <strong>Preview</strong>, and <strong>Save</strong>.</li>
 </ol>
