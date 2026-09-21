@@ -1,4 +1,6 @@
-# PDF Report Designer for Oracle APEX
+# VinAura: Visual PDF Report Designer for Oracle APEX
+
+VinAura is developed by [Vinish Kapoor](https://vinish.dev). This repository (`pdfgen-apex`) holds the complete project.
 
 Design PDF documents (invoices, statements, labels, reports) on a canvas, bind them to SQL queries and
 generate them from any APEX application with one PL/SQL call. No BI Publisher, no Word templates, no
