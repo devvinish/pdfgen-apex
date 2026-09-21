@@ -95,3 +95,17 @@ How to Use page is `app/help.html`. `local/` (passwords, logs, test output) is n
 - Images are JPEG (uploads are converted in the browser). Barcodes: Code 128 (QR is a next step).
 - Content streams are not compressed (a one-page invoice is about 30 KB).
 - A table row is never split across pages.
+
+## Licence
+
+VinAura is free to use under the [PolyForm Shield License 1.0.0](LICENSE.md).
+Copyright (c) 2026 [Vinish Kapoor](https://vinish.dev).
+
+- **You may:** use it free of charge, personally or in your company, and inside your own applications, including
+  commercial ones (for example an ERP that prints its invoices with VinAura). You may change it and share it.
+- **You may not:** sell or offer VinAura itself, or a product built from it that competes with it (another PDF
+  report designer or reporting tool), whether paid or free.
+- Keep the copyright notice (`Required Notice` in [LICENSE.md](LICENSE.md)) with any copy you pass on.
+- It comes as is, without any warranty. See the licence for the full terms.
+
+Security problems: see [SECURITY.md](SECURITY.md).
