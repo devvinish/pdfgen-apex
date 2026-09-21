@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 release/
 landing/preview.html
+landing/
+tools/build_landing.py
+tools/shots/
