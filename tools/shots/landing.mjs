@@ -8,6 +8,16 @@ const designerReady = [{ waitFor: '.pdfd-el' }, { wait: 1800 }];
 const asDesigned = { eval: `(() => { const s = pdfd.state();
   Object.values(s.layout.bands).forEach((b) => b.elements.forEach((e) => { if (e.font === 'arialblack') delete e.font; }));
   s.dirty = false; document.querySelector('.pdfd-zoom').click(); })()`, wait: 400 };
+// the queries in focus: a wide query panel showing each whole SELECT, the rest of the designer dimmed
+const queriesFocus = { eval: `(() => {
+  const st = document.createElement('style');
+  st.textContent = '.pdfd-main{grid-template-columns:600px minmax(0,1fr) 310px !important}'
+    + '.pdfd-left{position:relative;z-index:2;box-shadow:0 0 0 3px #1f5fd6,0 20px 60px rgba(15,27,45,.35)}'
+    + '.pdfd-main>:not(.pdfd-left),.pdfd-toolbar{opacity:.35;filter:grayscale(.6)}'
+    + '.pdfd-sql{font-size:13px !important;line-height:1.5 !important}';
+  document.head.appendChild(st);
+  document.querySelectorAll('.pdfd-sql').forEach((t) => { t.style.height = 'auto'; t.style.height = (t.scrollHeight + 4) + 'px'; });
+})()`, wait: 600 };
 // select an element of the canvas the way a mouse click does
 const pick = (test) => ({
   eval: `(() => { const e = [...document.querySelectorAll('.pdfd-el')].find((d) => ${test});
@@ -29,7 +39,7 @@ export default [
             { eval: "[...document.querySelectorAll('.pdfd-tab')].find((t) => t.textContent === 'Fields').click()", wait: 300 },
             pick("/CUSTOMER_NAME/.test(d.textContent)")] },
   // the queries tab, nothing selected (report properties)
-  { name: 'designer-queries', page: 1, steps: [openReport('Tax Invoice'), ...designerReady, asDesigned] },
+  { name: 'designer-queries', page: 1, steps: [openReport('Tax Invoice'), ...designerReady, asDesigned, queriesFocus] },
   // a label layout
   { name: 'designer-labels', page: 1,
     steps: [openReport('Product Labels (3 x 8)'), ...designerReady, pick("d.classList.contains('pdfd-el--barcode')")] },

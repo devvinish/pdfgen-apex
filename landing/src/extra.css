@@ -36,6 +36,9 @@
 #vinaura-lp .va-cmp-bar span em{font-style:normal;color:var(--muted);font-weight:500}
 #vinaura-lp .va-show-stage{aspect-ratio:2400/1500}
 
+#vinaura-lp .va-byline{margin-top:18px;font-size:14.5px;color:rgba(255,255,255,.78)}
+#vinaura-lp .va-byline a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
 /* development and production */
 #vinaura-lp .va-env{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:stretch}
 #vinaura-lp .va-env-card{position:relative;border-radius:26px;padding:32px;background:#fff;border:1px solid var(--line);border-top:4px solid var(--c)}
