@@ -1,6 +1,7 @@
 -- PDF Report Designer: the low-level PDF writer.
 -- Draws text, lines, boxes, rounded boxes, ellipses and JPEG images on pages of any size, with the
--- 14 standard PDF fonts (Helvetica, Times, Courier; regular, bold, italic) in WinAnsi encoding.
+-- 14 standard PDF fonts (Helvetica, Times, Courier; regular, bold, italic) in WinAnsi encoding, and the
+-- look-alikes Arial, Arial Narrow and Arial Black made from Helvetica.
 -- Coordinates are points (1/72 inch) from the TOP-LEFT corner of the page.
 set define off
 
@@ -17,7 +18,9 @@ create or replace package pdf_writer authid definer as
   function  page_width return number;
   function  page_height return number;
 
-  -- p_font: helvetica | times | courier
+  -- p_font: helvetica | times | courier | arial | arialnarrow | arialblack
+  -- (Arial has the letter widths of Helvetica; Arial Narrow is Helvetica at 82% width; Arial Black is
+  --  Helvetica Bold, 110% wide, drawn with an outline of its own colour - no font files needed)
   function  text_width(p_text varchar2, p_font varchar2, p_bold boolean, p_italic boolean,
                        p_size number) return number;
   -- p_y is the BASELINE of the text
@@ -191,6 +194,8 @@ create or replace package body pdf_writer as
     l_i boolean := nvl(p_italic, false);
   begin
     case lower(p_font)
+      when 'arialblack' then
+        return case when l_i then 'Helvetica-BoldOblique' else 'Helvetica-Bold' end;
       when 'times' then
         return case when l_b and l_i then 'Times-BoldItalic' when l_b then 'Times-Bold'
                     when l_i then 'Times-Italic' else 'Times-Roman' end;
@@ -216,9 +221,20 @@ create or replace package body pdf_writer as
     l_total number := 0;
     l_c     pls_integer;
     l_def   pls_integer;
-    l_font  varchar2(10) := lower(nvl(p_font, 'helvetica'));
+    l_font  varchar2(20) := lower(nvl(p_font, 'helvetica'));
     l_bold  boolean := nvl(p_bold, false);
+    l_scale number := 1;
   begin
+    -- the look-alikes of Arial: Helvetica metrics, scaled
+    if l_font = 'arialnarrow' then
+      l_scale := 0.82;
+    elsif l_font = 'arialblack' then
+      l_scale := 1.1;
+      l_bold := true;
+    end if;
+    if l_font in ('arial', 'arialnarrow', 'arialblack') then
+      l_font := 'helvetica';
+    end if;
     if p_text is null then
       return 0;
     end if;
@@ -239,7 +255,7 @@ create or replace package body pdf_writer as
         l_total := l_total + l_def;
       end if;
     end loop;
-    return l_total * p_size / 1000;
+    return l_total * p_size / 1000 * l_scale;
   end;
 
   -- the text in WinAnsi (Windows-1252) bytes, as a PDF hex string
@@ -257,9 +273,17 @@ create or replace package body pdf_writer as
     if p_text is null then
       return;
     end if;
-    put('BT /' || font_res(base_font(p_font, p_bold, p_italic)) || ' ' || num(p_size) || ' Tf ' ||
-        rgb(nvl(p_color, '#000000')) || ' rg ' || num(p_x) || ' ' || num(py(p_y)) || ' Td ' ||
-        win_hex(p_text) || ' Tj ET');
+    -- q .. Q: the scaling and the outline (text state) must not reach the text drawn after this one
+    put(case when lower(p_font) in ('arialnarrow', 'arialblack') then 'q ' end ||
+        'BT /' || font_res(base_font(p_font, p_bold, p_italic)) || ' ' || num(p_size) || ' Tf ' ||
+        rgb(nvl(p_color, '#000000')) || ' rg ' ||
+        case lower(p_font)
+          -- horizontal scaling (Tz); Arial Black also strokes the letters (2 Tr) to make them heavier
+          when 'arialnarrow' then '82 Tz '
+          when 'arialblack' then '110 Tz 2 Tr ' || rgb(nvl(p_color, '#000000')) || ' RG ' || num(p_size * 0.045) || ' w '
+        end ||
+        num(p_x) || ' ' || num(py(p_y)) || ' Td ' || win_hex(p_text) || ' Tj ET' ||
+        case when lower(p_font) in ('arialnarrow', 'arialblack') then ' Q' end);
   end;
 
   function dash_op(p_dash varchar2, p_width number) return varchar2 is

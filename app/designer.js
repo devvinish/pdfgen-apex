@@ -25,9 +25,15 @@ window.pdfd = (function ($) {
   var LABEL_BANDS = [['label', 'Label', 'One label. It is repeated for every row of the labels query, across then down.']];
   var FONTS = {
     helvetica: 'Helvetica, Arial, sans-serif',
+    arial: 'Arial, Helvetica, sans-serif',
+    arialnarrow: '"Arial Narrow", "Helvetica Neue Condensed", Arial, sans-serif',
+    arialblack: '"Arial Black", "Helvetica Neue", Arial, sans-serif',
     times: '"Times New Roman", Times, serif',
     courier: '"Courier New", Courier, monospace'
   };
+  // the fonts of the PDF (the Arial ones are look-alikes made from Helvetica: no font files needed)
+  var FONT_OPTIONS = [['helvetica', 'Helvetica'], ['arial', 'Arial'], ['arialnarrow', 'Arial Narrow'],
+    ['arialblack', 'Arial Black'], ['times', 'Times'], ['courier', 'Courier']];
   var MASKS = ['FM999G999G990D00', 'FM999G999G990', 'FM990D00', 'FM990D0', 'DD-MON-YYYY', 'DD-Mon-YYYY',
     'DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD', 'DD-MON-YYYY HH24:MI', 'fmMonth DD, YYYY'];
   // type, name, icon, what it is for (shown on hover)
@@ -1257,7 +1263,7 @@ window.pdfd = (function ($) {
   }
 
   function fontProps(s, e) {
-    field(s, 'Font', e, 'font', 'select', { half: true, options: [['', 'Default'], ['helvetica', 'Helvetica'], ['times', 'Times'], ['courier', 'Courier']] });
+    field(s, 'Font', e, 'font', 'select', { half: true, options: [['', 'Default']].concat(FONT_OPTIONS) });
     field(s, 'Size (pt)', e, 'size', 'number', { half: true, placeholder: String(S.layout.font.size || 9), step: 0.5 });
     var tg = h('div', { class: 'pdfd-seg' });
     [['bold', 'fa-bold', 'Bold'], ['italic', 'fa-italic', 'Italic'], ['underline', 'fa-underline', 'Underline']].forEach(function (t) {
@@ -1500,7 +1506,7 @@ window.pdfd = (function ($) {
     field(sh, 'Text size (pt)', t.header, 'size', 'number', { half: true, placeholder: 'as rows', step: 0.5 });
 
     var sr = section(p, 'Rows', false);
-    field(sr, 'Font', t, 'font', 'select', { half: true, options: [['', 'Default'], ['helvetica', 'Helvetica'], ['times', 'Times'], ['courier', 'Courier']] });
+    field(sr, 'Font', t, 'font', 'select', { half: true, options: [['', 'Default']].concat(FONT_OPTIONS) });
     field(sr, 'Size (pt)', t, 'size', 'number', { half: true, placeholder: String(S.layout.font.size || 9), step: 0.5 });
     field(sr, 'Text colour', t, 'color', 'color', { half: true, dflt: '#000000' });
     field(sr, 'Alternate rows', t, 'zebra', 'color', { half: true, dflt: '#F3F6FA' });
@@ -1539,7 +1545,7 @@ window.pdfd = (function ($) {
     var s = section(p, 'Change them all');
     var proxy = {};
     var apply = function (k, v) { checkpoint(); sel.forEach(function (f) { if (v === undefined || v === '') { delete f.el[k]; } else { f.el[k] = v; } }); setDirty(); renderCanvas(); };
-    var fsel = h('select', { class: 'pdfd-input', id: 'pdfd-m-font' }, [['', '-'], ['helvetica', 'Helvetica'], ['times', 'Times'], ['courier', 'Courier']].map(function (o) { return h('option', { value: o[0], text: o[1] }); }));
+    var fsel = h('select', { class: 'pdfd-input', id: 'pdfd-m-font' }, [['', '-']].concat(FONT_OPTIONS).map(function (o) { return h('option', { value: o[0], text: o[1] }); }));
     fsel.addEventListener('change', function () { if (fsel.value) { apply('font', fsel.value); } });
     s.appendChild(h('div', { class: 'pdfd-field pdfd-field--half' }, [h('label', { for: 'pdfd-m-font', text: 'Font' }), fsel]));
     var size = h('input', { type: 'number', class: 'pdfd-input', id: 'pdfd-m-size', step: '0.5' });
@@ -1599,7 +1605,7 @@ window.pdfd = (function ($) {
       });
     }
     var sf = section(p, 'Default font');
-    field(sf, 'Font', S.layout.font, 'family', 'select', { half: true, options: [['helvetica', 'Helvetica'], ['times', 'Times'], ['courier', 'Courier']], onChange: renderCanvas });
+    field(sf, 'Font', S.layout.font, 'family', 'select', { half: true, options: FONT_OPTIONS, onChange: renderCanvas });
     field(sf, 'Size (pt)', S.layout.font, 'size', 'number', { half: true, step: 0.5, onChange: renderCanvas });
     field(sf, 'Colour', S.layout.font, 'color', 'color', { half: true, required: true, dflt: '#000000', onChange: renderCanvas });
     buttonsRow(p, [['fa-file-o', 'Page setup', 'Page size, orientation and margins', pageSetup]]);
