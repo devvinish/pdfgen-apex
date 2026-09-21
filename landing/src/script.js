@@ -37,6 +37,22 @@
   if ('ResizeObserver' in window && root.parentElement) new ResizeObserver(function(){ fit(); }).observe(root.parentElement);
   var $ = function(s, c){ return (c || root).querySelector(s); };
   var $$ = function(s, c){ return Array.prototype.slice.call((c || root).querySelectorAll(s)); };
+  /* pictures: from the media library on vinish.dev; anywhere else (a local copy of the page,
+     or before they are uploaded) from the images folder next to the page */
+  var MEDIA = 'https://vinish.dev/wp-content/uploads/';
+  var localPic = function(url){ return 'images/' + url.split('/').pop(); };
+  var useLocal = !/(^|\.)vinish\.dev$/.test(location.hostname);
+  $$('img[src^="' + MEDIA + '"], [data-zoom^="' + MEDIA + '"]').forEach(function(el){
+    var z = el.getAttribute('data-zoom');
+    if (useLocal && z) el.setAttribute('data-zoom', localPic(z));
+    if (el.tagName !== 'IMG') return;
+    var toLocal = function(){ if (el.src.indexOf(MEDIA) === 0) el.src = localPic(el.src); };
+    if (useLocal) toLocal();
+    else {
+      el.addEventListener('error', toLocal);
+      if (el.complete && !el.naturalWidth) toLocal();
+    }
+  });
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* smooth scrolling that clears a sticky site header */

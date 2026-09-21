@@ -7,7 +7,7 @@ The landing page goes on vinish.dev. Its form sends each request to you by e-mai
 |---|---|
 | `vinaura-landing.html` | **The page.** Paste the whole file into one **Custom HTML** block. |
 | `images/vinaura-*.webp` | The screenshots and PDF pages. Upload all of them to the media library. |
-| `preview.html` | The same page with local pictures. Open it with `python3 -m http.server` from this folder. |
+| `preview.html` | The same page with local pictures. `vinaura-landing.html` also shows the local pictures when it is opened anywhere but vinish.dev (for example straight from this folder). |
 | `src/` | The sources: `body.html`, `base.css`, `extra.css`, `icons.svg`, `script.js`. |
 
 Edit the sources, not the built files. After a change, rebuild:

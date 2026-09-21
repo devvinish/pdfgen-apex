@@ -15,14 +15,14 @@
       <div class="va-panels"><div class="va-panels-in">
         <div class="va-panel" data-panel="product">
           <a class="va-pcard" href="#va-inside"><img src="{{IMG}}vinaura-designer-invoice.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>See the designer</b><small>Queries, bands, tables and live preview</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
-          <ul class="va-plist"><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li><li><a href="#va-get">Request VinAura</a></li><li class="va-pnote">Pure PL/SQL. Oracle Database 19c or later, Oracle APEX 26.1 designer.</li></ul>
+          <ul class="va-plist"><li><a href="#va-what">Development and production</a></li><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li><li><a href="#va-get">Request VinAura</a></li><li class="va-pnote">Pure PL/SQL. Oracle Database 19c or later, Oracle APEX 26.1 designer.</li></ul>
         </div>
         <div class="va-panel" data-panel="tutorial">
           <a class="va-pcard" href="#va-tutorial"><img src="{{IMG}}vinaura-demo-dialog.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>The tutorial</b><small>From install to a PDF in a dialog</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
           <ul class="va-plist"><li><a href="#va-t1">1. Install</a></li><li><a href="#va-t2">2. Write the queries</a></li><li><a href="#va-t3">3. Design the layout</a></li><li><a href="#va-t4">4. Preview and save</a></li><li><a href="#va-t5">5. Get the PDF as a BLOB</a></li><li><a href="#va-t6">6. Show it in a dialog</a></li><li><a href="#va-t7">7. New tab and download</a></li><li><a href="#va-t8">8. Batches, labels, e-mail, REST</a></li></ul>
         </div>
         <div class="va-panel" data-panel="all">
-          <div class="va-pgroup"><h4>Product</h4><ul class="va-plist"><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li></ul></div>
+          <div class="va-pgroup"><h4>Product</h4><ul class="va-plist"><li><a href="#va-what">Development and production</a></li><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li></ul></div>
           <div class="va-pgroup"><h4>Tutorial</h4><ul class="va-plist"><li><a href="#va-t1">Install</a></li><li><a href="#va-t2">Write the queries</a></li><li><a href="#va-t3">Design the layout</a></li><li><a href="#va-t5">Get the PDF as a BLOB</a></li><li><a href="#va-t6">Show it in a dialog</a></li><li><a href="#va-t8">Batches, labels, e-mail, REST</a></li></ul></div>
           <div class="va-pgroup"><h4>Help</h4><ul class="va-plist"><li><a href="#va-faq">FAQ</a></li><li><a href="#va-get">Request VinAura</a></li></ul></div>
         </div>
@@ -36,9 +36,9 @@
 <section class="va-hero" id="va-top">
   <div class="va-wrap">
     <div class="va-hero-copy">
-      <a class="va-pill" href="#va-how"><b>NEW</b> Pure PL/SQL: no BI Publisher, no print server</a>
-      <h1>The visual <em>PDF report designer</em> for <span style="white-space:nowrap">Oracle APEX</span></h1>
-      <p class="va-lead">Draw invoices, statements and labels on a canvas, bind them to your SQL queries and page items, and get the PDF from any APEX page with one PL/SQL call. VinAura runs entirely inside your Oracle database: nothing to install on a server, no Word templates, no extra licences.</p>
+      <a class="va-pill" href="#va-what"><b>APEX</b> An Oracle APEX application for your development workspace</a>
+      <h1>The visual <em>PDF report designer</em> for Oracle APEX</h1>
+      <p class="va-lead">VinAura is an Oracle APEX application that you install in your development environment. In it you draw invoices, statements and labels on a canvas, bind them to your SQL queries and page items, and get the PDF from any APEX page with one PL/SQL call. VinAura runs entirely inside your Oracle database: nothing to install on a server, no Word templates, no extra licences.</p>
       <div class="va-cta">
         <a class="va-btn va-btn-primary" href="#va-get">Request VinAura <svg><use href="#va-i-arrow"/></svg></a>
         <a class="va-btn va-btn-ghost" href="#va-tutorial"><svg><use href="#va-i-book"/></svg> Read the tutorial</a>
@@ -73,6 +73,42 @@
     </ul>
   </div>
 </div>
+
+<!-- ============ What it is ============ -->
+<section class="va-mods va-slab va-bg-paper" id="va-what">
+  <div class="va-wrap">
+    <div class="va-head va-center va-reveal">
+      <span class="va-eyebrow">What VinAura is</span>
+      <h2 class="va-h2">Design in development. Print in production.</h2>
+      <p class="va-lead">VinAura is an Oracle APEX application that runs inside Oracle APEX, next to your own applications. You use it in your development environment to design the reports your applications print. Production needs only the small PL/SQL runtime and your reports, not the designer.</p>
+    </div>
+    <div class="va-env">
+      <div class="va-env-card va-reveal" style="--c:var(--brand)">
+        <span class="va-ico"><svg><use href="#va-i-pen"/></svg></span>
+        <span class="va-env-tag">Development</span>
+        <h3>The designer application</h3>
+        <p>Import VinAura into your development workspace, beside the application you are building. There you write each report's queries, draw its layout, preview it, and try the call your pages will make.</p>
+        <ul class="va-list">
+          <li>The VinAura APEX application: designer, reports, log, <em>How to Use</em></li>
+          <li>The <code>PDF_*</code> tables and packages, including the designer package</li>
+          <li>Optional demo data and sample reports to learn from</li>
+        </ul>
+      </div>
+      <div class="va-env-arrow va-reveal" aria-hidden="true"><svg><use href="#va-i-arrow"/></svg><span>export the reports</span></div>
+      <div class="va-env-card va-reveal" style="--c:var(--teal)">
+        <span class="va-ico"><svg><use href="#va-i-bolt"/></svg></span>
+        <span class="va-env-tag">Production</span>
+        <h3>Only the runtime</h3>
+        <p>Your application in production prints with one PL/SQL call. It needs four tables, three packages and the reports you designed. There is no designer application, no demo, and no extra server.</p>
+        <ul class="va-list">
+          <li>Tables <code>PDF_REPORTS</code>, <code>PDF_QUERIES</code>, <code>PDF_IMAGES</code>, <code>PDF_LOG</code></li>
+          <li>Packages <code>PDF_API</code>, <code>PDF_ENGINE</code>, <code>PDF_WRITER</code></li>
+          <li>Your reports and logos, exported from development as JSON or copied as rows</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ============ Why ============ -->
 <section class="va-story va-slab va-bg-sand" id="va-why">
