@@ -19,10 +19,7 @@ HEADER = """<!--
 
   1. The pictures are linked straight from the WordPress media library:
        {media}vinaura-designer-invoice.webp ... (upload every file of landing/images)
-  2. The form posts to data-endpoint: the Rounds lead mailer plugin, version 2.1.0 or later,
-     which knows the product, company, country and licence fields (see landing/README.md).
-     If it can't be reached, the form offers an e-mail link to data-fallback-email (leave it
-     empty to show no address on the public page).
+  2. "Get VinAura PDF" leads to the GitHub repository: https://github.com/devvinish/pdfgen-apex
   Built by tools/build_landing.py from landing/src - edit the sources, not this file.
 -->
 """
@@ -59,8 +56,9 @@ def json_ld(body: str) -> str:
                     "Amount in words", "Code 128 barcodes and label sheets", "Batch documents",
                     "Any page size, portrait or landscape", "Logos and images", "Export and import as JSON",
                 ],
-                "offers": {"@type": "Offer", "availability": "https://schema.org/InStock",
-                           "url": PAGE_URL + "#va-get", "description": "Price on request"},
+                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD",
+                           "url": "https://github.com/devvinish/pdfgen-apex"},
+                "downloadUrl": "https://github.com/devvinish/pdfgen-apex",
                 "author": {"@type": "Person", "name": "Vinish Kapoor", "url": "https://vinish.dev"},
             },
             {"@type": "FAQPage", "mainEntity": faqs},
@@ -74,7 +72,7 @@ def build(img_base: str) -> str:
     css = (SRC / "base.css").read_text().rstrip() + "\n\n" + (SRC / "extra.css").read_text()
     return (
         HEADER.format(media=MEDIA)
-        + '<div id="vinaura-lp" class="alignfull"\n     data-endpoint="/wp-json/rounds/v1/lead"\n     data-fallback-email="">\n\n'
+        + '<div id="vinaura-lp" class="alignfull">\n\n'
         + "<style>\n" + css.strip() + "\n</style>\n\n"
         + (SRC / "icons.svg").read_text().strip() + "\n\n"
         + body.strip() + "\n\n"

@@ -64,7 +64,6 @@
     e.preventDefault();
     var y = t.getBoundingClientRect().top + window.pageYOffset - 96;
     window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
-    if (a.getAttribute('href') === '#va-get') setTimeout(function(){ var n = $('#va-name'); if (n) n.focus({ preventScroll: true }); }, 650);
   });
 
   /* header: mega panels that grow out of the bar, menu button, shadow once scrolled */
@@ -232,50 +231,4 @@
     lb.addEventListener('click', function(e){ if (e.target === lb) lb.close(); });
   }
 
-  /* the form */
-  var form = $('#va-form'), card = $('#va-form-card'), msg = $('.va-msg', form), btn = $('button[type=submit]', form);
-  var opened = Date.now();
-  var rules = {
-    name: function(v){ return v.length >= 2 || 'Please enter your name.'; },
-    company: function(v){ return v.length >= 2 || 'Please enter your company.'; },
-    email: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || 'Please enter a valid e-mail address.'; },
-    phone: function(v){ return !v || v.replace(/\D/g, '').length >= 7 || 'Please check the phone number, or leave it empty.'; }
-  };
-  function check(name){
-    var el = form.elements[name], field = el.closest('.va-field'), ok = rules[name](el.value.trim());
-    field.classList.toggle('va-bad', ok !== true);
-    $('.va-err', field).textContent = ok === true ? '' : ok;
-    return ok === true;
-  }
-  Object.keys(rules).forEach(function(n){
-    form.elements[n].addEventListener('blur', function(){ if (this.value) check(n); });
-    form.elements[n].addEventListener('input', function(){ if (this.closest('.va-field').classList.contains('va-bad')) check(n); });
-  });
-  function mailtoFallback(data){
-    var to = root.getAttribute('data-fallback-email');
-    var body = Object.keys(data).filter(function(k){ return k !== 'website' && k !== 'elapsed' && data[k]; })
-      .map(function(k){ return k.charAt(0).toUpperCase() + k.slice(1) + ': ' + data[k]; }).join('\n');
-    return 'mailto:' + to + '?subject=' + encodeURIComponent('VinAura request - ' + (data.company || '')) + '&body=' + encodeURIComponent(body);
-  }
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    msg.className = 'va-msg'; msg.textContent = '';
-    var bad = Object.keys(rules).filter(function(n){ return !check(n); });
-    if (bad.length) { form.elements[bad[0]].focus(); return; }
-    var data = {};
-    Array.prototype.forEach.call(form.elements, function(el){ if (el.name) data[el.name] = el.value.trim(); });
-    data.elapsed = Math.round((Date.now() - opened) / 1000);
-    btn.disabled = true; btn.classList.add('va-busy'); $('.va-btn-text', btn).textContent = 'Sending…';
-    fetch(root.getAttribute('data-endpoint'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), credentials: 'same-origin' })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (!r.ok || !j.ok) throw new Error(j.message || 'failed'); }); })
-      .then(function(){ card.classList.add('va-sent'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); })
-      .catch(function(err){
-        msg.className = 'va-msg va-err-box';
-        var known = err && err.message && err.message !== 'failed' && !/fetch|network|JSON/i.test(err.message);
-        var to = root.getAttribute('data-fallback-email');
-        msg.innerHTML = (known ? '' : 'Sorry, the form could not be sent just now. Please try again in a moment.') + '<span></span>' + (to ? ' <a href="' + mailtoFallback(data) + '">Or send it by e-mail</a>.' : '');
-        if (known) msg.querySelector('span').textContent = err.message;
-      })
-      .then(function(){ btn.disabled = false; btn.classList.remove('va-busy'); $('.va-btn-text', btn).textContent = 'Request VinAura'; });
-  });
 })();

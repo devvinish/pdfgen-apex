@@ -128,6 +128,24 @@
 /* stats row under the architecture */
 #vinaura-lp .va-tech .va-layer .va-num{font-size:13px}
 
+/* the repository card */
+#vinaura-lp .va-repo{background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:var(--shadow-lg);min-width:0}
+#vinaura-lp .va-repo-head{display:flex;align-items:center;gap:14px}
+#vinaura-lp .va-repo-ic{width:48px;height:48px;flex:none;border-radius:14px;background:#0f1726;color:#fff;display:grid;place-items:center}
+#vinaura-lp .va-repo-ic svg{width:28px;height:28px}
+#vinaura-lp .va-repo-head small{display:block;font-size:13px;color:var(--muted)}
+#vinaura-lp .va-repo-head b{display:block;font:600 20px/1.25 var(--head);color:var(--ink);word-break:break-word}
+#vinaura-lp .va-repo-pub{margin-left:auto;padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);font:600 12px/1 var(--body);color:var(--muted)}
+#vinaura-lp .va-repo > p{margin-top:16px;font-size:15.5px;line-height:1.55;color:var(--ink-2)}
+#vinaura-lp .va-repo-files{margin:18px 0 22px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+#vinaura-lp .va-repo-files li{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:14.5px;color:var(--muted);border-top:1px solid var(--line)}
+#vinaura-lp .va-repo-files li:first-child{border-top:0}
+#vinaura-lp .va-repo-files svg{width:17px;height:17px;flex:none;color:var(--brand)}
+#vinaura-lp .va-repo-files code{background:none;padding:0;font-weight:600;min-width:130px}
+#vinaura-lp .va-repo-btn{width:100%;justify-content:center}
+#vinaura-lp .va-repo .va-code pre{white-space:pre-wrap;word-break:break-all}
+@media (max-width:640px){#vinaura-lp .va-repo{padding:22px}#vinaura-lp .va-repo-files li{flex-wrap:wrap}#vinaura-lp .va-repo-files span{flex-basis:100%;padding-left:27px}}
+
 /* pricing / request steps */
 #vinaura-lp .va-price{margin-top:30px;padding:22px 24px;border-radius:18px;background:#fff;border:1px solid var(--line);display:flex;gap:18px;align-items:flex-start}
 #vinaura-lp .va-price .va-ico{flex:none}

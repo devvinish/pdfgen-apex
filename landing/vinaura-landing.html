@@ -3,15 +3,10 @@
 
   1. The pictures are linked straight from the WordPress media library:
        https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp ... (upload every file of landing/images)
-  2. The form posts to data-endpoint: the Rounds lead mailer plugin, version 2.1.0 or later,
-     which knows the product, company, country and licence fields (see landing/README.md).
-     If it can't be reached, the form offers an e-mail link to data-fallback-email (leave it
-     empty to show no address on the public page).
+  2. "Get VinAura PDF" leads to the GitHub repository: https://github.com/devvinish/pdfgen-apex
   Built by tools/build_landing.py from landing/src - edit the sources, not this file.
 -->
-<div id="vinaura-lp" class="alignfull"
-     data-endpoint="/wp-json/rounds/v1/lead"
-     data-fallback-email="">
+<div id="vinaura-lp" class="alignfull">
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
@@ -709,6 +704,24 @@ body:has(#vinaura-lp){margin:0}
 /* stats row under the architecture */
 #vinaura-lp .va-tech .va-layer .va-num{font-size:13px}
 
+/* the repository card */
+#vinaura-lp .va-repo{background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:var(--shadow-lg);min-width:0}
+#vinaura-lp .va-repo-head{display:flex;align-items:center;gap:14px}
+#vinaura-lp .va-repo-ic{width:48px;height:48px;flex:none;border-radius:14px;background:#0f1726;color:#fff;display:grid;place-items:center}
+#vinaura-lp .va-repo-ic svg{width:28px;height:28px}
+#vinaura-lp .va-repo-head small{display:block;font-size:13px;color:var(--muted)}
+#vinaura-lp .va-repo-head b{display:block;font:600 20px/1.25 var(--head);color:var(--ink);word-break:break-word}
+#vinaura-lp .va-repo-pub{margin-left:auto;padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);font:600 12px/1 var(--body);color:var(--muted)}
+#vinaura-lp .va-repo > p{margin-top:16px;font-size:15.5px;line-height:1.55;color:var(--ink-2)}
+#vinaura-lp .va-repo-files{margin:18px 0 22px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+#vinaura-lp .va-repo-files li{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:14.5px;color:var(--muted);border-top:1px solid var(--line)}
+#vinaura-lp .va-repo-files li:first-child{border-top:0}
+#vinaura-lp .va-repo-files svg{width:17px;height:17px;flex:none;color:var(--brand)}
+#vinaura-lp .va-repo-files code{background:none;padding:0;font-weight:600;min-width:130px}
+#vinaura-lp .va-repo-btn{width:100%;justify-content:center}
+#vinaura-lp .va-repo .va-code pre{white-space:pre-wrap;word-break:break-all}
+@media (max-width:640px){#vinaura-lp .va-repo{padding:22px}#vinaura-lp .va-repo-files li{flex-wrap:wrap}#vinaura-lp .va-repo-files span{flex-basis:100%;padding-left:27px}}
+
 /* pricing / request steps */
 #vinaura-lp .va-price{margin-top:30px;padding:22px 24px;border-radius:18px;background:#fff;border:1px solid var(--line);display:flex;gap:18px;align-items:flex-start}
 #vinaura-lp .va-price .va-ico{flex:none}
@@ -762,6 +775,7 @@ body:has(#vinaura-lp){margin:0}
     <symbol id="va-i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="m3 7 9 6 9-6"/></symbol>
     <symbol id="va-i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/></symbol>
     <symbol id="va-i-tag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="va-i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.39-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></symbol>
   </defs>
 </svg>
 
@@ -782,7 +796,7 @@ body:has(#vinaura-lp){margin:0}
       <div class="va-panels"><div class="va-panels-in">
         <div class="va-panel" data-panel="product">
           <a class="va-pcard" href="#va-inside"><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-designer-invoice.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>See the designer</b><small>Queries, bands, tables and live preview</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
-          <ul class="va-plist"><li><a href="#va-what">Development and production</a></li><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li><li><a href="#va-get">Request VinAura</a></li><li class="va-pnote">Pure PL/SQL. Oracle Database 19c or later, Oracle APEX 26.1 designer.</li></ul>
+          <ul class="va-plist"><li><a href="#va-what">Development and production</a></li><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li><li><a href="#va-get">Get VinAura PDF</a></li><li class="va-pnote">Pure PL/SQL. Oracle Database 19c or later, Oracle APEX 26.1 designer.</li></ul>
         </div>
         <div class="va-panel" data-panel="tutorial">
           <a class="va-pcard" href="#va-tutorial"><img src="https://vinish.dev/wp-content/uploads/2026/09/vinaura-demo-dialog.webp" alt="" loading="lazy"><span class="va-pcard-foot"><span><b>The tutorial</b><small>From install to a PDF in a dialog</small></span><span class="va-arrow"><svg><use href="#va-i-arrow"/></svg></span></span></a>
@@ -791,11 +805,11 @@ body:has(#vinaura-lp){margin:0}
         <div class="va-panel" data-panel="all">
           <div class="va-pgroup"><h4>Product</h4><ul class="va-plist"><li><a href="#va-what">Development and production</a></li><li><a href="#va-why">Why VinAura</a></li><li><a href="#va-how">How it works</a></li><li><a href="#va-inside">Inside the designer</a></li><li><a href="#va-features">Features</a></li><li><a href="#va-pdfs">Sample PDFs</a></li><li><a href="#va-architecture">Architecture</a></li></ul></div>
           <div class="va-pgroup"><h4>Tutorial</h4><ul class="va-plist"><li><a href="#va-t1">Install</a></li><li><a href="#va-t2">Write the queries</a></li><li><a href="#va-t3">Design the layout</a></li><li><a href="#va-t5">Get the PDF as a BLOB</a></li><li><a href="#va-t6">Show it in a dialog</a></li><li><a href="#va-t8">Batches, labels, e-mail, REST</a></li></ul></div>
-          <div class="va-pgroup"><h4>Help</h4><ul class="va-plist"><li><a href="#va-faq">FAQ</a></li><li><a href="#va-get">Request VinAura</a></li></ul></div>
+          <div class="va-pgroup"><h4>Help</h4><ul class="va-plist"><li><a href="#va-faq">FAQ</a></li><li><a href="#va-get">Get VinAura PDF</a></li></ul></div>
         </div>
       </div></div>
     </div>
-    <a class="va-quote" href="#va-get" aria-label="Request VinAura"><span class="va-quote-t">Request VinAura</span><span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
+    <a class="va-quote" href="#va-get" aria-label="Get VinAura PDF"><span class="va-quote-t">Get VinAura PDF</span><span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
   </div>
 </nav>
 
@@ -807,7 +821,7 @@ body:has(#vinaura-lp){margin:0}
       <h1>The visual <em>PDF report designer</em> for Oracle APEX</h1>
       <p class="va-lead">VinAura is an Oracle APEX application that you install in your development environment. In it you draw invoices, statements and labels on a canvas, bind them to your SQL queries and page items, and get the PDF from any APEX page with one PL/SQL call. VinAura runs entirely inside your Oracle database: nothing to install on a server, no Word templates, no extra licences.</p>
       <div class="va-cta">
-        <a class="va-btn va-btn-primary" href="#va-get">Request VinAura <svg><use href="#va-i-arrow"/></svg></a>
+        <a class="va-btn va-btn-primary" href="#va-get">Get VinAura PDF <svg><use href="#va-i-arrow"/></svg></a>
         <a class="va-btn va-btn-ghost" href="#va-tutorial"><svg><use href="#va-i-book"/></svg> Read the tutorial</a>
       </div>
       <p class="va-byline">Developed by <a href="https://vinish.dev" target="_blank" rel="noopener">Vinish Kapoor</a></p>
@@ -1048,7 +1062,7 @@ end;</code></pre></div>
         <div class="va-fcard" style="--c:var(--brand)">
           <h4>The quick way: import the application</h4>
           <ol class="va-list">
-            <li>App Builder &gt; Import &gt; <code>pdf_report_designer.sql</code> from the VinAura zip.</li>
+            <li>App Builder &gt; Import &gt; <code>dist/pdf_report_designer.sql</code> from the GitHub repository.</li>
             <li>Choose the parsing schema, and <b>Install Supporting Objects</b>.</li>
             <li>It creates the <code>PDF_*</code> tables and packages, and the demo tables and sample reports.</li>
           </ol>
@@ -1342,7 +1356,7 @@ end;</code></pre></div>
   <div class="va-wrap">
     <p class="va-words">Design it once. Print it from any page in APEX. No BI Publisher, no Word templates, no print server.</p>
     <div class="va-callout-foot">
-      <a class="va-qbtn" href="#va-get">Request VinAura <span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
+      <a class="va-qbtn" href="#va-get">Get VinAura PDF <span class="va-quote-ic"><svg><use href="#va-i-arrow"/></svg></span></a>
       <ul>
         <li><svg><use href="#va-i-check"/></svg>The designer application</li>
         <li><svg><use href="#va-i-check"/></svg>The PL/SQL engine and API</li>
@@ -1358,7 +1372,7 @@ end;</code></pre></div>
     <div class="va-head va-reveal">
       <span class="va-eyebrow">FAQ</span>
       <h2 class="va-h2">Frequently asked</h2>
-      <p class="va-lead">Anything else? Ask in the request form and we'll answer personally.</p>
+      <p class="va-lead">Anything else? Open an issue on <a href="https://github.com/devvinish/pdfgen-apex/issues" target="_blank" rel="noopener">GitHub</a>.</p>
     </div>
     <div class="va-reveal">
       <details open><summary>Do I need BI Publisher, a print server or APEX Office Print?</summary><p>No. VinAura makes the PDF in PL/SQL inside your database. There is nothing to install or run beside Oracle and APEX.</p></details>
@@ -1368,62 +1382,41 @@ end;</code></pre></div>
       <details><summary>Where are the layouts kept?</summary><p>In tables of your schema: PDF_REPORTS (the layout, as JSON) and PDF_QUERIES. A report can be exported as JSON and imported into another environment.</p></details>
       <details><summary>Which fonts and characters does it print?</summary><p>Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier, in regular, bold and italic, with the characters of Western European languages. The rupee sign prints as Rs.</p></details>
       <details><summary>How fast is it, and how big are the files?</summary><p>A one-page invoice with a logo takes about 30 ms and is about 35 KB. A batch of invoices is one call and one file.</p></details>
-      <details><summary>How much does it cost?</summary><p>The price is on request. Send the form with the licence you need and you'll receive a PayPal invoice within one business day; the download follows the payment.</p></details>
-      <details><summary>What do I receive?</summary><p>A zip with the APEX application export, the SQL scripts of the tables and packages, the demo data and sample reports, and the installation guide.</p></details>
+      <details><summary>Is it free?</summary><p>Yes. VinAura is free on GitHub. Download it, install it in your workspace, and change it to fit your applications.</p></details>
+      <details><summary>What is in the repository?</summary><p>The APEX application export (dist/pdf_report_designer.sql), the SQL scripts of the tables and packages, the demo data and sample reports, the source of the designer, and the installation guide (docs/INSTALL.md).</p></details>
     </div>
   </div>
 </section>
 
-<!-- ============ Request ============ -->
+<!-- ============ Get it ============ -->
 <section class="va-get va-slab va-bg-paper" id="va-get">
   <div class="va-wrap va-get-grid">
     <div class="va-reveal">
-      <span class="va-eyebrow">Request VinAura</span>
-      <h2 class="va-h2">Get VinAura for your APEX applications</h2>
-      <p class="va-lead">Tell us who you are and which licence you need. We read every request ourselves.</p>
+      <span class="va-eyebrow">Get VinAura PDF</span>
+      <h2 class="va-h2">Free on GitHub</h2>
+      <p class="va-lead">VinAura is on GitHub, free to download. Take the whole project, install it in your development workspace, fork it and change it as you need.</p>
       <ol class="va-steps">
-        <li><span><b>Send the request</b>Your name, your company and the licence you need.</span></li>
-        <li><span><b>A PayPal invoice</b>Within one business day, with your company details on it.</span></li>
-        <li><span><b>Download VinAura</b>After the payment you receive the zip and the installation guide.</span></li>
+        <li><span><b>Open the repository</b>On GitHub: devvinish/pdfgen-apex.</span></li>
+        <li><span><b>Download or clone it</b>Code &gt; Download ZIP, or git clone.</span></li>
+        <li><span><b>Install it</b>Follow docs/INSTALL.md, or chapter 1 of the tutorial above.</span></li>
       </ol>
-      <div class="va-price">
-        <span class="va-ico" style="--c:var(--teal)"><svg><use href="#va-i-tag"/></svg></span>
-        <div><b>Price on request</b><p>For one developer, a team or the whole company. Ask about installation help and custom reports too.</p></div>
-      </div>
     </div>
 
-    <div class="va-form va-reveal" id="va-form-card">
-      <h3>Request VinAura</h3>
-      <p>Fields marked <span style="color:var(--rose)">*</span> are required.</p>
-      <form id="va-form" novalidate>
-        <input type="hidden" name="product" value="VinAura">
-        <div class="va-fields">
-          <div class="va-field"><label for="va-name">Your name <i>*</i></label><input id="va-name" name="name" type="text" autocomplete="name" required maxlength="100"><span class="va-err"></span></div>
-          <div class="va-field"><label for="va-role">Your role</label>
-            <select id="va-role" name="role"><option value="">Select&hellip;</option><option>APEX developer</option><option>Team lead / architect</option><option>IT manager</option><option>Consultant / partner</option><option>Business owner</option><option>Other</option></select></div>
-          <div class="va-field va-full"><label for="va-company">Company <i>*</i></label><input id="va-company" name="company" type="text" autocomplete="organization" required maxlength="150"><span class="va-err"></span></div>
-          <div class="va-field"><label for="va-email">E-mail <i>*</i></label><input id="va-email" name="email" type="email" autocomplete="email" required maxlength="150"><span class="va-err"></span></div>
-          <div class="va-field"><label for="va-phone">Phone</label><input id="va-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20"><span class="va-err"></span></div>
-          <div class="va-field"><label for="va-country">Country</label><input id="va-country" name="country" type="text" autocomplete="country-name" maxlength="80"></div>
-          <div class="va-field"><label for="va-licence">Licence</label>
-            <select id="va-licence" name="licence"><option>One developer</option><option>A team (up to 5 developers)</option><option>The whole company</option><option>Not sure yet</option></select></div>
-          <div class="va-field va-full"><label for="va-interest">I'm interested in</label>
-            <select id="va-interest" name="interest"><option>Buying VinAura</option><option>A live demo first</option><option>Help with installation</option><option>Custom report design</option><option>Something else</option></select></div>
-          <div class="va-field va-full"><label for="va-message">Anything else we should know?</label><textarea id="va-message" name="message" maxlength="3000" placeholder="Your Oracle and APEX versions, the reports you want to make&hellip;"></textarea></div>
-          <div class="va-hp" aria-hidden="true"><label for="va-website">Website</label><input id="va-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
-        </div>
-        <div class="va-form-foot">
-          <button class="va-btn va-btn-primary" type="submit"><span class="va-spin"></span><span class="va-btn-text">Request VinAura</span><svg><use href="#va-i-arrow"/></svg></button>
-          <small>We only use your details to reply to this request. No newsletters.</small>
-        </div>
-        <div class="va-msg" role="alert"></div>
-      </form>
-      <div class="va-done" role="status">
-        <div class="va-shield"><svg><use href="#va-i-check"/></svg></div>
-        <h3>Thank you, we've got it</h3>
-        <p>Your request is on its way. You'll hear from us within one business day.</p>
-        <div class="va-cta" style="justify-content:center"><a class="va-btn va-btn-ghost" href="#va-tutorial"><svg><use href="#va-i-book"/></svg> Read the tutorial meanwhile</a></div>
+    <div class="va-repo va-reveal">
+      <div class="va-repo-head">
+        <span class="va-repo-ic"><svg><use href="#va-i-github"/></svg></span>
+        <div><small>github.com</small><b>devvinish / pdfgen-apex</b></div>
+        <span class="va-repo-pub">Public</span>
       </div>
+      <p>VinAura, the visual PDF report designer for Oracle APEX: the designer application, the PL/SQL engine and API, demo screens and sample reports.</p>
+      <ul class="va-repo-files">
+        <li><svg><use href="#va-i-window"/></svg><code>dist/</code><span>the APEX application to import</span></li>
+        <li><svg><use href="#va-i-db"/></svg><code>sql/</code><span>tables, packages, demo data, sample reports</span></li>
+        <li><svg><use href="#va-i-book"/></svg><code>docs/INSTALL.md</code><span>development and production installs</span></li>
+        <li><svg><use href="#va-i-pen"/></svg><code>app/</code><span>the designer's JavaScript and CSS</span></li>
+      </ul>
+      <a class="va-btn va-btn-primary va-repo-btn" href="https://github.com/devvinish/pdfgen-apex" target="_blank" rel="noopener"><svg><use href="#va-i-github"/></svg> Open on GitHub <svg><use href="#va-i-arrow"/></svg></a>
+      <div class="va-code"><div class="va-code-bar"><span>Or clone it</span><button type="button" class="va-copy"><svg><use href="#va-i-copy"/></svg><span>Copy</span></button></div><pre><code>git clone https://github.com/devvinish/pdfgen-apex.git</code></pre></div>
     </div>
   </div>
 </section>
@@ -1432,7 +1425,7 @@ end;</code></pre></div>
   <div class="va-wrap">
     <div class="va-foot-top">
       <p>VinAura is the visual PDF report designer for Oracle APEX: invoices, statements and labels, designed on a canvas and made in PL/SQL.</p>
-      <nav><a href="#va-how">How it works</a><a href="#va-features">Features</a><a href="#va-pdfs">Sample PDFs</a><a href="#va-tutorial">Tutorial</a><a href="#va-faq">FAQ</a><a href="#va-get">Request VinAura</a></nav>
+      <nav><a href="#va-how">How it works</a><a href="#va-features">Features</a><a href="#va-pdfs">Sample PDFs</a><a href="#va-tutorial">Tutorial</a><a href="#va-faq">FAQ</a><a href="#va-get">Get VinAura PDF</a></nav>
     </div>
     <div class="va-foot-mark" aria-hidden="true"><span>VinAura</span></div>
     <div class="va-foot-bot"><span>VinAura &middot; Visual PDF Report Designer for Oracle APEX</span><span>Developed by <a href="https://vinish.dev" target="_blank" rel="noopener">Vinish Kapoor</a></span></div>
@@ -1475,10 +1468,11 @@ end;</code></pre></div>
    ],
    "offers": {
     "@type": "Offer",
-    "availability": "https://schema.org/InStock",
-    "url": "https://vinish.dev/vinaura/#va-get",
-    "description": "Price on request"
+    "price": "0",
+    "priceCurrency": "USD",
+    "url": "https://github.com/devvinish/pdfgen-apex"
    },
+   "downloadUrl": "https://github.com/devvinish/pdfgen-apex",
    "author": {
     "@type": "Person",
     "name": "Vinish Kapoor",
@@ -1546,18 +1540,18 @@ end;</code></pre></div>
     },
     {
      "@type": "Question",
-     "name": "How much does it cost?",
+     "name": "Is it free?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "The price is on request. Send the form with the licence you need and you'll receive a PayPal invoice within one business day; the download follows the payment."
+      "text": "Yes. VinAura is free on GitHub. Download it, install it in your workspace, and change it to fit your applications."
      }
     },
     {
      "@type": "Question",
-     "name": "What do I receive?",
+     "name": "What is in the repository?",
      "acceptedAnswer": {
       "@type": "Answer",
-      "text": "A zip with the APEX application export, the SQL scripts of the tables and packages, the demo data and sample reports, and the installation guide."
+      "text": "The APEX application export (dist/pdf_report_designer.sql), the SQL scripts of the tables and packages, the demo data and sample reports, the source of the designer, and the installation guide (docs/INSTALL.md)."
      }
     }
    ]
@@ -1633,7 +1627,6 @@ end;</code></pre></div>
     e.preventDefault();
     var y = t.getBoundingClientRect().top + window.pageYOffset - 96;
     window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
-    if (a.getAttribute('href') === '#va-get') setTimeout(function(){ var n = $('#va-name'); if (n) n.focus({ preventScroll: true }); }, 650);
   });
 
   /* header: mega panels that grow out of the bar, menu button, shadow once scrolled */
@@ -1801,52 +1794,6 @@ end;</code></pre></div>
     lb.addEventListener('click', function(e){ if (e.target === lb) lb.close(); });
   }
 
-  /* the form */
-  var form = $('#va-form'), card = $('#va-form-card'), msg = $('.va-msg', form), btn = $('button[type=submit]', form);
-  var opened = Date.now();
-  var rules = {
-    name: function(v){ return v.length >= 2 || 'Please enter your name.'; },
-    company: function(v){ return v.length >= 2 || 'Please enter your company.'; },
-    email: function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || 'Please enter a valid e-mail address.'; },
-    phone: function(v){ return !v || v.replace(/\D/g, '').length >= 7 || 'Please check the phone number, or leave it empty.'; }
-  };
-  function check(name){
-    var el = form.elements[name], field = el.closest('.va-field'), ok = rules[name](el.value.trim());
-    field.classList.toggle('va-bad', ok !== true);
-    $('.va-err', field).textContent = ok === true ? '' : ok;
-    return ok === true;
-  }
-  Object.keys(rules).forEach(function(n){
-    form.elements[n].addEventListener('blur', function(){ if (this.value) check(n); });
-    form.elements[n].addEventListener('input', function(){ if (this.closest('.va-field').classList.contains('va-bad')) check(n); });
-  });
-  function mailtoFallback(data){
-    var to = root.getAttribute('data-fallback-email');
-    var body = Object.keys(data).filter(function(k){ return k !== 'website' && k !== 'elapsed' && data[k]; })
-      .map(function(k){ return k.charAt(0).toUpperCase() + k.slice(1) + ': ' + data[k]; }).join('\n');
-    return 'mailto:' + to + '?subject=' + encodeURIComponent('VinAura request - ' + (data.company || '')) + '&body=' + encodeURIComponent(body);
-  }
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    msg.className = 'va-msg'; msg.textContent = '';
-    var bad = Object.keys(rules).filter(function(n){ return !check(n); });
-    if (bad.length) { form.elements[bad[0]].focus(); return; }
-    var data = {};
-    Array.prototype.forEach.call(form.elements, function(el){ if (el.name) data[el.name] = el.value.trim(); });
-    data.elapsed = Math.round((Date.now() - opened) / 1000);
-    btn.disabled = true; btn.classList.add('va-busy'); $('.va-btn-text', btn).textContent = 'Sending…';
-    fetch(root.getAttribute('data-endpoint'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data), credentials: 'same-origin' })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ if (!r.ok || !j.ok) throw new Error(j.message || 'failed'); }); })
-      .then(function(){ card.classList.add('va-sent'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); })
-      .catch(function(err){
-        msg.className = 'va-msg va-err-box';
-        var known = err && err.message && err.message !== 'failed' && !/fetch|network|JSON/i.test(err.message);
-        var to = root.getAttribute('data-fallback-email');
-        msg.innerHTML = (known ? '' : 'Sorry, the form could not be sent just now. Please try again in a moment.') + '<span></span>' + (to ? ' <a href="' + mailtoFallback(data) + '">Or send it by e-mail</a>.' : '');
-        if (known) msg.querySelector('span').textContent = err.message;
-      })
-      .then(function(){ btn.disabled = false; btn.classList.remove('va-busy'); $('.va-btn-text', btn).textContent = 'Request VinAura'; });
-  });
 })();
 </script>
 </div>
