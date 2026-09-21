@@ -108,4 +108,9 @@ Copyright (c) 2026 [Vinish Kapoor](https://vinish.dev).
 - Keep the copyright notice (`Required Notice` in [LICENSE.md](LICENSE.md)) with any copy you pass on.
 - It comes as is, without any warranty. See the licence for the full terms.
 
+## Contributing
+
+This project doesn't accept pull requests. Please report bugs and ideas as
+[Issues](https://github.com/devvinish/pdfgen-apex/issues). You're welcome to fork it under the terms of the licence.
+
 Security problems: see [SECURITY.md](SECURITY.md).
