@@ -1,0 +1,121 @@
+<div class="pdfh">
+<style>
+.pdfh { max-width: 980px; margin: 0 auto; font-size: 14px; line-height: 1.55; color: #1d2530; }
+.pdfh h2 { font-size: 20px; margin: 28px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e1e6ed; }
+.pdfh h3 { font-size: 15px; margin: 18px 0 6px; }
+.pdfh pre { background: #0f1b2b; color: #e6edf7; padding: 12px 14px; border-radius: 6px; overflow: auto; font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+.pdfh code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; background: #eef2f7; padding: 1px 4px; border-radius: 3px; }
+.pdfh pre code { background: none; padding: 0; }
+.pdfh table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; }
+.pdfh th, .pdfh td { border: 1px solid #dde3ea; padding: 6px 8px; text-align: left; vertical-align: top; }
+.pdfh th { background: #f3f6fa; }
+.pdfh ol li, .pdfh ul li { margin: 3px 0; }
+.pdfh .note { background: #fff8e1; border-left: 4px solid #f2a900; padding: 8px 12px; border-radius: 4px; }
+</style>
+
+<h2>1. Make a report</h2>
+<ol>
+  <li><strong>Reports &gt; New Report.</strong> Give it a <em>code</em> (for example <code>INVOICE</code>). Your applications call the report by this code.</li>
+  <li><strong>Queries</strong> (left panel): write one <code>SELECT</code> for each part of the document, up to 10 (Q1 to Q10). For example, Q1 is the invoice header, Q2 the invoice lines and Q3 the totals. Use your page items as bind variables: <code>where invoice_id = :P11_INVOICE_ID</code>. Click <span class="fa fa-check"></span> to check a query and read its columns.</li>
+  <li><strong>Fields</strong>: drag a field onto a band to print it, or onto a table to add a column.</li>
+  <li><strong>Toolbar</strong>: add text, boxes, rounded boxes, circles, lines, images, tables and barcodes. Drag them into place, resize them by their handles, and set their properties on the right.</li>
+  <li><strong>Page</strong>: page size (A4, A3, A5, Letter, Legal, ... or a custom size), portrait or landscape, and margins.</li>
+  <li><strong>Parameters</strong>: test values for the bind variables. Then use <strong>Preview</strong>, and <strong>Save</strong>.</li>
+</ol>
+
+<h2>2. Bands</h2>
+<table>
+  <tr><th>Band</th><th>Prints</th><th>Use it for</th></tr>
+  <tr><td>Page Header</td><td>at the top of every page (or first / not first / last / not last)</td><td>logo, company, document title and number</td></tr>
+  <tr><td>Report Header</td><td>once, at the start</td><td>bill-to and ship-to boxes, invoice details</td></tr>
+  <tr><td>Body</td><td>flows over as many pages as it needs</td><td>tables of rows (the lines of an invoice). A table repeats its header row on every page. Whatever is below a table moves down with it.</td></tr>
+  <tr><td>Summary</td><td>once, after the body (or at the bottom of the last page)</td><td>totals box, amount in words, terms, signature</td></tr>
+  <tr><td>Page Footer</td><td>at the bottom of every page</td><td>Page {PAGE} of {PAGES}, notes</td></tr>
+</table>
+<p>A <strong>labels</strong> layout has one band, the label. It is repeated for every row of its query: across, then down. Set the label size, how many go across and down, and the gaps in Page Setup.</p>
+<p><strong>One document per row</strong> (Report properties): the whole layout repeats for every row of Q1. Use it for batch printing, such as all invoices of a day in one PDF. The other queries read the current row of Q1 as <code>:Q1_INVOICE_ID</code>, <code>:Q1_CUSTOMER_ID</code>, and so on. Page numbers restart for every document.</p>
+
+<h2>3. Tokens</h2>
+<table>
+  <tr><th>Token</th><th>Prints</th></tr>
+  <tr><td><code>{Q1.CUSTOMER_NAME}</code></td><td>a column of a query: inside a table or a label, the current row; elsewhere, the first row</td></tr>
+  <tr><td><code>{Q2.AMOUNT|FM999G999G990D00}</code></td><td>with an Oracle format mask (numbers and dates). The <em>Format mask</em> property does the same for a single token.</td></tr>
+  <tr><td><code>{SUM(Q2.AMOUNT)}</code> <code>{COUNT(Q2)}</code> <code>{AVG(..)}</code> <code>{MIN(..)}</code> <code>{MAX(..)}</code></td><td>over all the rows of a query</td></tr>
+  <tr><td><code>{WORDS(Q3.GRAND_TOTAL)}</code></td><td>an amount in words in the Indian system (lakh, crore, paise); <code>{WORDS(Q3.TOTAL)|INTL}</code> uses million and billion</td></tr>
+  <tr><td><code>{PAGE}</code> <code>{PAGES}</code></td><td>the page number and the page count (use them in the page header or footer)</td></tr>
+  <tr><td><code>{TODAY}</code> <code>{TODAY|DD/MM/YYYY}</code> <code>{NOW}</code> <code>{APP_USER}</code> <code>{REPORT}</code></td><td>date, date and time, user, report name</td></tr>
+  <tr><td><code>{P11_INVOICE_ID}</code></td><td>a parameter or page item</td></tr>
+</table>
+<p><strong>Print when</strong> (any element): <code>{Q1.STATUS} = PAID</code> prints a PAID stamp only on paid invoices, and <code>{Q3.DISCOUNT}</code> prints only when there is a discount. The operators are <code>= != &gt; &lt; &gt;= &lt;=</code>.</p>
+
+<h2>4. Call it from your application</h2>
+<h3>One time: let your application's schema use the API</h3>
+<p>The queries of a report run as the schema that calls the API (the parsing schema of your application), so they see your own tables. Run as <code>PDFGEN</code> (or a DBA):</p>
+<pre><code>grant execute on pdfgen.pdf_api to your_schema;
+-- then, as your_schema:
+create synonym pdf_api for pdfgen.pdf_api;</code></pre>
+<p>If a call fails with ORA-06598 (insufficient INHERIT PRIVILEGES), a DBA has removed the default privilege. Restore it with <code>grant inherit privileges on user your_schema to pdfgen;</code></p>
+<p class="note">The designer's Preview runs the queries as <code>PDFGEN</code>. For tables in another schema, grant <code>PDFGEN</code> select on them (or create views) so the preview can read them.</p>
+
+<h3>Get the PDF as a BLOB</h3>
+<pre><code>declare
+  l_pdf blob;
+begin
+  -- page items (:P11_INVOICE_ID) are read from session state
+  l_pdf := pdf_api.generate('INVOICE');
+
+  -- or give the values yourself
+  l_pdf := pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', 1003));
+
+  -- store it, mail it (apex_mail.add_attachment), ...
+end;</code></pre>
+
+<h3>Show it in the browser: a dialog, or a new tab</h3>
+<p><code>p_params</code> is a list of pairs: the name of a bind variable of the report's queries, then its value. <code>apex_t_varchar2('P11_INVOICE_ID', :P92_INVOICE_ID)</code> fills <code>:P11_INVOICE_ID</code> of the report INVOICE with the value of the item <code>P92_INVOICE_ID</code>. A bind without a value in <code>p_params</code> takes the page item of that name from session state.</p>
+<ol>
+  <li><strong>An application process</strong> (Shared Components &gt; Application Processes, Point <em>Ajax Callback</em>), named <code>INVOICE_PDF</code>:
+<pre><code>pdf_api.download('INVOICE',
+  p_params =&gt; apex_t_varchar2('P11_INVOICE_ID', :P92_INVOICE_ID));</code></pre></li>
+  <li><strong>A modal dialog page</strong> (page 92 <em>Invoice PDF</em>) with:
+    <ul>
+      <li>a hidden item <code>P92_INVOICE_ID</code> (Session State Protection: <em>Unrestricted</em>);</li>
+      <li>a region of type <strong>URL</strong>, Inclusion Mode <em>IFrame</em>, URL <code>f?p=&amp;APP_ID.:0:&amp;SESSION.:APPLICATION_PROCESS=INVOICE_PDF</code>, IFrame Attributes <code>style="width:100%;height:calc(100vh - 70px);border:0"</code>.</li>
+    </ul></li>
+  <li><strong>Open the dialog</strong> from a link or a button: <em>Target</em> page 92, <em>Set Items</em> <code>P92_INVOICE_ID</code> = <code>#INVOICE_ID#</code> (a column of an interactive report) or <code>&amp;P11_INVOICE_ID.</code> (an item of a form page). APEX opens it as a dialog because page 92 is a modal page.</li>
+  <li><strong>A new tab</strong>: a button, action <em>Redirect to URL</em>:
+<pre><code>javascript:window.open('f?p=&amp;APP_ID.:0:&amp;SESSION.:APPLICATION_PROCESS=INVOICE_PDF:::P92_INVOICE_ID:&amp;P11_INVOICE_ID.', '_blank');</code></pre>
+  To download instead of showing it, add <code>p_inline =&gt; false</code> to <code>pdf_api.download</code> (in a process of its own).</li>
+</ol>
+
+<h3>Labels, batches</h3>
+<pre><code>-- all invoices of September in one PDF (report INVOICE_BATCH repeats per row of Q1)
+l_pdf := pdf_api.generate('INVOICE_BATCH',
+           apex_t_varchar2('P10_DATE_FROM', '01-SEP-2026', 'P10_DATE_TO', '30-SEP-2026'));
+
+-- labels: 24 of one product, starting on the 5th label of a sheet that is partly used
+l_pdf := pdf_api.generate('PRODUCT_LABELS',
+           apex_t_varchar2('P30_SKU', 'NW-GLV-100', 'P30_COPIES', 24, 'LABEL_START', 5));</code></pre>
+
+<h3>The Demo screens</h3>
+<p>The <strong>Demo</strong> menu (Invoices, Customers, Products) is built exactly this way. Every row of the interactive reports has a <em>Preview</em> link; every edit screen has <em>Preview</em> and <em>New tab</em> buttons.</p>
+<table>
+  <tr><th>Dialog page</th><th>Its items</th><th>Application process</th><th>Opened from</th></tr>
+  <tr><td>92 Invoice PDF</td><td><code>P92_INVOICE_ID</code></td><td><code>INVOICE_PDF</code></td><td>Invoices (10), Invoice (11), Customer (21)</td></tr>
+  <tr><td>93 Statement PDF</td><td><code>P93_CUSTOMER_ID</code></td><td><code>STATEMENT_PDF</code></td><td>Customers (20), Customer (21)</td></tr>
+  <tr><td>94 Label PDF</td><td><code>P94_SKU</code></td><td><code>LABEL_PDF</code></td><td>Products (30), Product (31)</td></tr>
+  <tr><td>95 Labels PDF</td><td><code>P95_CATEGORY</code>, <code>P95_COPIES</code></td><td><code>LABELS_PDF</code></td><td>Products (30): Print Shelf Labels</td></tr>
+  <tr><td>96 Invoices PDF</td><td><code>P96_DATE_FROM</code>, <code>P96_DATE_TO</code></td><td><code>INVOICES_PDF</code></td><td>Invoices (10): Print the Invoices of a Period</td></tr>
+</table>
+<p>On pages 10 and 30 a change of the dates, the category or the copies submits the page, so the <em>Preview</em> button carries the new values (<code>&amp;P10_DATE_FROM.</code> ...).</p>
+
+<h2>5. Move reports between environments</h2>
+<p>On <strong>Reports</strong>, <em>Export</em> downloads a report (layout and queries) as JSON. <em>New Report &gt; Import</em> loads it into another environment. Images are kept in <code>PDF_IMAGES</code>, so copy that table's rows too.</p>
+
+<h2>6. Good to know</h2>
+<ul>
+  <li>Fonts: Helvetica, Times and Courier (regular, bold, italic). They print the characters of Western European languages; the rupee sign prints as <code>Rs.</code></li>
+  <li>Images: uploads (PNG, JPEG, ...) are stored as JPEG. An image can also come from a BLOB column holding a JPEG: <code>{Q1.PHOTO}</code>.</li>
+  <li>Barcodes: Code 128. A table row grows with long text; a row is never split across pages.</li>
+  <li>Every PDF made through <code>pdf_api</code> is logged (Log): who, which report, pages, time, errors. The log keeps 90 days.</li>
+</ul>
+</div>
