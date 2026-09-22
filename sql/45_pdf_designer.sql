@@ -30,9 +30,15 @@ create or replace package pdf_designer authid definer as
   function base64(p_blob blob) return clob;
   function unbase64(p_data clob) return blob;
 
-  -- the JSON of a report for export, and its import (replaces a report with the same code)
+  -- the JSON of a report for export: its layout, queries and the images it uses
   function export_json(p_report_id number) return clob;
-  function import_json(p_json clob) return number;
+  -- its import; p_code: the code it gets here (null: the exported one);
+  -- p_replace: Y replaces a report with that code, N raises an error when one exists
+  function import_json(p_json clob, p_code varchar2 default null, p_replace varchar2 default 'N') return number;
+  -- a SQL script that puts the reports (codes) and their images into another schema / database:
+  -- run it there as the schema that owns the PDF_ tables. p_replace: Y replaces reports that exist
+  -- there, N leaves them as they are
+  function deploy_script(p_codes apex_t_varchar2, p_replace varchar2 default 'Y') return clob;
 
 end pdf_designer;
 /
@@ -65,48 +71,21 @@ create or replace package body pdf_designer as
   end;
 
   function base64(p_blob blob) return clob is
-    l_out clob;
-    l_pos number := 1;
-    l_len number := dbms_lob.getlength(p_blob);
-    l_raw raw(32767);
-    c_step constant pls_integer := 12000;     -- a multiple of 3 (the encoded chunk stays under 32K)
   begin
-    dbms_lob.createtemporary(l_out, true);
-    while l_pos <= l_len loop
-      l_raw := utl_encode.base64_encode(dbms_lob.substr(p_blob, c_step, l_pos));
-      dbms_lob.append(l_out, replace(replace(utl_raw.cast_to_varchar2(l_raw), chr(13)), chr(10)));
-      l_pos := l_pos + c_step;
-    end loop;
-    return l_out;
+    return pdf_repo.base64(p_blob);
   end;
 
   function unbase64(p_data clob) return blob is
-    l_out   blob;
-    l_data  clob := p_data;
-    l_start number := 1;
-    l_len   number;
-    l_raw   raw(32767);
-    l_chunk varchar2(32767);
-    c_step  constant pls_integer := 16000;    -- a multiple of 4
   begin
-    if dbms_lob.instr(l_data, 'base64,') > 0 then
-      l_start := dbms_lob.instr(l_data, 'base64,') + 7;
-    end if;
-    l_len := dbms_lob.getlength(l_data);
-    dbms_lob.createtemporary(l_out, true);
-    while l_start <= l_len loop
-      l_chunk := dbms_lob.substr(l_data, c_step, l_start);
-      l_raw := utl_encode.base64_decode(utl_raw.cast_to_raw(l_chunk));
-      dbms_lob.writeappend(l_out, utl_raw.length(l_raw), l_raw);
-      l_start := l_start + c_step;
-    end loop;
-    return l_out;
+    return pdf_repo.unbase64(p_data);
   end;
 
-  function report_json(p_report_id number, p_with_id boolean) return json_object_t is
+  function report_json(p_report_id number, p_with_id boolean, p_images boolean default false) return json_object_t is
     l_out  json_object_t := json_object_t();
     l_qs   json_array_t := json_array_t();
     l_q    json_object_t;
+    l_imgs json_array_t := json_array_t();
+    l_img  json_object_t;
   begin
     for r in (select * from pdf_reports where report_id = p_report_id) loop
       if p_with_id then
@@ -125,6 +104,26 @@ create or replace package body pdf_designer as
       l_qs.append(l_q);
     end loop;
     l_out.put('queries', l_qs);
+    if p_images then
+      -- the images the layout uses by name (not the images of a query: {Q1.PHOTO})
+      for i in (select name, width, height, content
+                  from pdf_images
+                 where name in (select jt.src
+                                  from pdf_reports r,
+                                       json_table(r.layout, '$.bands.*.elements[*]'
+                                                  columns (type varchar2(20) path '$.type',
+                                                           src  varchar2(200) path '$.src')) jt
+                                 where r.report_id = p_report_id and jt.type = 'image' and jt.src not like '{%')
+                 order by name) loop
+        l_img := json_object_t();
+        l_img.put('name', i.name);
+        l_img.put('width', i.width);
+        l_img.put('height', i.height);
+        l_img.put('data', base64(i.content));
+        l_imgs.append(l_img);
+      end loop;
+      l_out.put('images', l_imgs);
+    end if;
     return l_out;
   end;
 
@@ -404,47 +403,119 @@ create or replace package body pdf_designer as
   end;
 
   function export_json(p_report_id number) return clob is
-    l json_object_t := report_json(p_report_id, false);
+    l json_object_t := report_json(p_report_id, false, true);
   begin
     l.put('format', 'pdf-report-designer');
     return l.to_clob;
   end;
 
-  function import_json(p_json clob) return number is
-    l_in     json_object_t;
-    l_code   varchar2(60);
-    l_name   varchar2(200);
-    l_desc   varchar2(4000);
-    l_layout clob;
-    l_id     number;
+  function import_json(p_json clob, p_code varchar2 default null, p_replace varchar2 default 'N') return number is
   begin
+    return pdf_repo.import_report(p_json, p_code, p_replace);
+  end;
+
+  function deploy_script(p_codes apex_t_varchar2, p_replace varchar2 default 'Y') return clob is
+    l_out   clob;
+    l_json  clob;
+    l_chunk varchar2(32767);
+    l_q     varchar2(1);
+    l_pos   number;
+    l_len   number;
+    l_n     pls_integer := 0;
+    l_rep   boolean := upper(nvl(p_replace, 'Y')) in ('Y', 'YES', 'TRUE');
+    c_step  constant pls_integer := 500;      -- short lines: SQL*Plus and SQLcl limit the line length
+    procedure w(p varchar2) is
     begin
-      l_in := json_object_t.parse(p_json);
-    exception
-      when others then
-        raise_application_error(-20510, 'This is not valid JSON.');
+      dbms_lob.writeappend(l_out, nvl(length(p), 0) + 1, p || chr(10));
     end;
-    l_code := upper(trim(l_in.get_string('code')));
-    if l_code is null or not l_in.has('layout') then
-      raise_application_error(-20510, 'This is not a report exported by the PDF Report Designer.');
-    end if;
-    l_name := substr(l_in.get_string('name'), 1, 200);
-    l_desc := substr(l_in.get_string('description'), 1, 4000);
-    l_layout := l_in.get_object('layout').to_clob;
+    -- JSON text in ASCII only: other characters as \uXXXX escapes, so the script reads the same in any
+    -- client character set (SQL*Plus without NLS_LANG would change them)
+    function ascii_json(p varchar2) return varchar2 is
+      l_out varchar2(32767);
+      l_ch  varchar2(8);
+      l_hex varchar2(16);
     begin
-      select report_id into l_id from pdf_reports where code = l_code;
-      update pdf_reports
-         set name = nvl(l_name, name), description = l_desc,
-             layout = l_layout, updated_by = coalesce(v('APP_USER'), user), updated_on = sysdate
-       where report_id = l_id;
-    exception
-      when no_data_found then
-        insert into pdf_reports (code, name, description, layout)
-        values (l_code, nvl(l_name, l_code), l_desc, l_layout)
-        returning report_id into l_id;
+      if p is null or not regexp_like(p, '[^' || chr(1) || '-' || chr(127) || ']') then
+        return p;
+      end if;
+      for i in 1 .. length(p) loop
+        l_ch := substr(p, i, 1);
+        if ascii(l_ch) < 128 then
+          l_out := l_out || l_ch;
+        else
+          l_hex := rawtohex(utl_i18n.string_to_raw(l_ch, 'AL16UTF16'));
+          for j in 0 .. length(l_hex) / 4 - 1 loop
+            l_out := l_out || '\u' || substr(l_hex, j * 4 + 1, 4);
+          end loop;
+        end if;
+      end loop;
+      return l_out;
     end;
-    save_queries(l_id, l_in.get_array('queries'));
-    return l_id;
+  begin
+    dbms_lob.createtemporary(l_out, true);
+    w('-- VinAura / PDF Report Designer: reports for deployment');
+    w('-- Made ' || to_char(sysdate, 'DD-MON-YYYY HH24:MI') || ' in schema ' || sys_context('USERENV', 'CURRENT_SCHEMA') ||
+      ' by ' || coalesce(v('APP_USER'), user) || '.');
+    w('--');
+    w('-- Run it in SQL Developer (Run Script, F5) or SQLcl as the schema that owns the tables PDF_REPORTS,');
+    w('-- PDF_QUERIES and PDF_IMAGES in the target database. It needs only the tables and packages of');
+    w('-- 10_tables.sql to 40_pdf_api.sql there, not the designer application.');
+    w('-- Reports that exist there already are ' || case when l_rep then 'replaced.' else 'left as they are.' end);
+    w('-- The images the reports use (logos, stamps) come with them.');
+    w('set define off');
+    w('set serveroutput on');
+    for c in (select r.report_id, r.code, r.name
+                from pdf_reports r
+                join table(p_codes) t on upper(trim(t.column_value)) = r.code
+               order by r.code) loop
+      l_n := l_n + 1;
+      w(null);
+      w('prompt ' || c.code || ' (' || ascii_json(replace(c.name, chr(10), ' ')) || ')');
+      w('declare');
+      w('  l_json clob;');
+      w('  l_id   number;');
+      w('  procedure a(p varchar2) is begin dbms_lob.writeappend(l_json, length(p), p); end;');
+      w('begin');
+      w('  dbms_lob.createtemporary(l_json, true);');
+      l_json := export_json(c.report_id);
+      l_len := dbms_lob.getlength(l_json);
+      l_pos := 1;
+      while l_pos <= l_len loop
+        l_chunk := ascii_json(dbms_lob.substr(l_json, c_step, l_pos));
+        -- a q'<c>...<c>' quote whose closing <c>' is not in the text
+        l_q := null;
+        for k in 1 .. 8 loop
+          if instr(l_chunk, substr('~^!#|@%*', k, 1) || '''') = 0 then
+            l_q := substr('~^!#|@%*', k, 1);
+            exit;
+          end if;
+        end loop;
+        w('  a(q''' || l_q || l_chunk || l_q || ''');');
+        l_pos := l_pos + c_step;
+      end loop;
+      if l_rep then
+        w('  l_id := pdf_repo.import_report(l_json, p_replace => ''Y'');');
+        w('  dbms_output.put_line(''' || c.code || ': imported'');');
+      else
+        w('  begin');
+        w('    l_id := pdf_repo.import_report(l_json, p_replace => ''N'');');
+        w('    dbms_output.put_line(''' || c.code || ': imported'');');
+        w('  exception');
+        w('    when others then');
+        w('      if sqlcode = -20511 then');
+        w('        dbms_output.put_line(''' || c.code || ': exists already, left as it is'');');
+        w('      else');
+        w('        raise;');
+        w('      end if;');
+        w('  end;');
+      end if;
+      w('end;');
+      w('/');
+    end loop;
+    w(null);
+    w('commit;');
+    w('prompt ' || l_n || ' report(s) done.');
+    return l_out;
   end;
 
 end pdf_designer;

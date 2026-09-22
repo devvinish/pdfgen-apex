@@ -140,6 +140,7 @@ NAV = [('Reports', 1, 'fa-file-pdf-o', '1,2,3', None),
                                             ('Customers', 20, 'fa-users', '20,21'),
                                             ('Products', 30, 'fa-cubes', '30,31')]),
        ('Try the API', 4, 'fa-play-circle', '4', None),
+       ('Deploy', 8, 'fa-upload', '8', None),
        ('Log', 6, 'fa-history', '6', None), ('How to Use', 7, 'fa-question-circle', '7', None)]
 
 
@@ -446,7 +447,36 @@ NEW_REPORT = """:P3_REPORT_ID := pdf_designer.create_report(
   p_orientation => :P3_ORIENTATION,
   p_copy_of     => :P3_COPY_OF);"""
 
-IMPORT_REPORT = """:P3_REPORT_ID := pdf_designer.import_json(:P3_IMPORT);"""
+IMPORT_REPORT = """declare
+  l_json clob;
+  l_blob blob;
+  l_dest integer := 1;
+  l_src  integer := 1;
+  l_ctx  integer := dbms_lob.default_lang_ctx;
+  l_warn integer;
+begin
+  -- the exported .json file, or the JSON pasted in the text area
+  if :P3_IMPORT_FILE is not null then
+    select blob_content into l_blob from apex_application_temp_files where name = :P3_IMPORT_FILE;
+    dbms_lob.createtemporary(l_json, true);
+    dbms_lob.converttoclob(l_json, l_blob, dbms_lob.lobmaxsize, l_dest, l_src, nls_charset_id('AL32UTF8'), l_ctx, l_warn);
+  else
+    l_json := :P3_IMPORT;
+  end if;
+  if l_json is null or dbms_lob.getlength(l_json) = 0 then
+    raise_application_error(-20513, 'Choose the exported .json file, or paste its JSON.');
+  end if;
+  :P3_REPORT_ID := pdf_designer.import_json(l_json, :P3_IMPORT_CODE, :P3_IMPORT_REPLACE);
+exception
+  when others then
+    -- the reasons of the import (exists already, not valid JSON ...) without the ORA- number
+    if sqlcode between -20599 and -20500 then
+      apex_error.add_error(p_message => regexp_replace(sqlerrm, '^ORA-2[0-9]{4}: '),
+                           p_display_location => apex_error.c_inline_in_notification);
+    else
+      raise;
+    end if;
+end;"""
 
 
 def page_new(ctx):
@@ -474,11 +504,22 @@ def page_new(ctx):
                  'A report with this code exists already.', seq=20, button=create)
     p.process('Create the report', NEW_REPORT, button=create, seq=10)
 
-    ri = p.static('Import a Report (JSON)', seq=20, options='#DEFAULT#:is-collapsed:t-Region--scrollBody',
+    ri = p.static('Import a Report (JSON)', seq=20, options='#DEFAULT#:is-collapsed:js-useLocalStorage:t-Region--scrollBody',
                   template='region_collapsible')
-    p.item('P3_IMPORT', ri, kind='textarea', label='Report JSON (from Export)', height=8,
-           inline_help='A report with the same code is replaced; otherwise it is added.')
-    imp = p.button('IMPORT', 'Import', ri, position='NEXT')
+    p.static('Import help', seq=5, parent=ri, template='region_blank', html=(
+        '<p>Brings in a report exported from another workspace or database (Reports &gt; Export): its layout, '
+        'its queries and the images it uses. To move several reports to production in one go, use '
+        '<a href="f?p=&APP_ID.:8:&SESSION.">Deploy</a>.</p>'))
+    p.item('P3_IMPORT_FILE', ri, kind='file', label='Exported report (.json file)',
+           attrs_={'file_types': '.json', 'dropzone_title': 'Choose or drop the .json file'})
+    p.item('P3_IMPORT', ri, kind='textarea', label='Or paste its JSON', height=4,
+           inline_help='Pasting works for small reports; a report with images is better imported as a file.')
+    p.item('P3_IMPORT_CODE', ri, label='Code here', maxlen=60, placeholder='the code of the export',
+           inline_help='Leave it empty to keep the code of the export. Give a new code (e.g. INVOICE_V2) '
+                       'to add it as a new report next to the one you have.')
+    p.item('P3_IMPORT_REPLACE', ri, kind='yesno', label='Replace the report with this code if it exists', default='N',
+           inline_help='Off: the import stops when a report with this code exists, so nothing is overwritten.')
+    imp = p.button('IMPORT', 'Import', ri, position='NEXT', validations='N')
     p.process('Import the report', IMPORT_REPORT, button=imp, seq=20, success='Report imported.')
     p.branch('f?p=&APP_ID.:2:&SESSION.::&DEBUG.::P2_REPORT_ID:&P3_REPORT_ID.', seq=10)
     return p
@@ -593,6 +634,42 @@ def page_export(ctx):
     return p
 
 
+DEPLOY_SCRIPT = """declare
+  l_sql clob;
+begin
+  l_sql := pdf_designer.deploy_script(apex_string.split(:P8_REPORTS, ':'), :P8_EXISTING);
+  sys.htp.init;
+  sys.owa_util.mime_header('text/plain', false, 'utf-8');
+  sys.htp.p('Content-Disposition: attachment; filename="vinaura_reports_' || to_char(sysdate, 'YYYYMMDD_HH24MI') || '.sql"');
+  sys.owa_util.http_header_close;
+  apex_util.prn(l_sql, false);
+  apex_application.stop_apex_engine;
+end;"""
+
+DEPLOY_HTML = """<p>Moves reports to another workspace, schema or database, for example from development to production,
+without the designer application there.</p>
+<ol>
+  <li>Tick the reports and download the script.</li>
+  <li>In the target database, open the script in <b>SQL Developer</b> (Run Script, F5) or <b>SQLcl</b>, connected as the
+      schema that owns the tables <code>PDF_REPORTS</code>, <code>PDF_QUERIES</code> and <code>PDF_IMAGES</code>,
+      and run it.</li>
+</ol>
+<p>The script carries each report's layout, its queries and the images it uses (logos, stamps). It needs only
+the tables and packages of <code>10_tables.sql</code> to <code>40_pdf_api.sql</code> in the target.</p>"""
+
+
+def page_deploy(ctx):
+    p = Page(ctx.app, 8, 'Deploy', 'DEPLOY', title='Deploy Reports', group=ctx.group_main, component_map='02')
+    p.static('How it works', seq=5, html=DEPLOY_HTML, template='region_blank')
+    r = p.static('Deploy Reports', seq=10)
+    p.item('P8_REPORTS', r, kind='checkbox', label='Reports', named_lov='PDF_REPORTS', required=True)
+    p.item('P8_EXISTING', r, kind='radio', label='Reports that exist in the target', default='Y',
+           lov='STATIC2:Replace them;Y,Leave them as they are;N')
+    dl = p.button('DOWNLOAD', 'Download Script', r, position='NEXT', hot=True, icon='fa-download')
+    p.process('Download the script', DEPLOY_SCRIPT, button=dl, seq=10)
+    return p
+
+
 LOG_SQL = """select log_id, created_on, report_code, pages, bytes, elapsed_ms, app_id, page_id, app_user, params,
        error, case when error is null then 'OK' else 'Error' end status
   from pdf_log"""
@@ -649,7 +726,7 @@ def build(app_id, no_auth, name, alias, with_objects):
     app = App(Ids())
     ctx = Ctx(app)
     pages = [page_reports(ctx), page_designer(ctx), page_new(ctx), page_try(ctx), page_export(ctx),
-             page_log(ctx), page_help(ctx)] + demo_pages.pages(ctx)
+             page_log(ctx), page_help(ctx), page_deploy(ctx)] + demo_pages.pages(ctx)
     if not no_auth:
         pages.append(login(ctx))
     exp = Export()

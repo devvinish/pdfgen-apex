@@ -108,8 +108,21 @@ l_pdf := pdf_api.generate('PRODUCT_LABELS',
 </table>
 <p>On pages 10 and 30 a change of the dates, the category or the copies submits the page, so the <em>Preview</em> button carries the new values (<code>&amp;P10_DATE_FROM.</code> ...).</p>
 
-<h2>5. Move reports between environments</h2>
-<p>On <strong>Reports</strong>, <em>Export</em> downloads a report (layout and queries) as JSON. <em>New Report &gt; Import</em> loads it into another environment. Images are kept in <code>PDF_IMAGES</code>, so copy that table's rows too.</p>
+<h2>5. Move reports to production</h2>
+<p>A report travels with its layout, its queries and the images it uses (logos, stamps). The target can be another schema, workspace or database.</p>
+<p><strong>Several reports, no designer in production: Deploy.</strong></p>
+<ol>
+  <li>Open <a href="f?p=&APP_ID.:8:&SESSION.">Deploy</a>, tick the reports and choose whether reports that exist in the target are replaced or left as they are.</li>
+  <li><em>Download Script</em>. You get one <code>.sql</code> file.</li>
+  <li>In production, run it in SQL Developer (<em>Run Script</em>, F5) or SQLcl, connected as the schema that owns the <code>PDF_</code> tables. It prints one line per report and commits.</li>
+</ol>
+<p>Production needs only the tables and packages of <code>10_tables.sql</code> to <code>40_pdf_api.sql</code>: not this application.</p>
+<p><strong>One report, with this application on both sides: Export and Import.</strong></p>
+<ol>
+  <li>On <strong>Reports</strong>, the <em>JSON</em> link in the <em>Export</em> column downloads the report, images included.</li>
+  <li>In the other environment, <strong>New Report &gt; Import a Report (JSON)</strong>: choose the file, then either give it a new code (for example <code>INVOICE_V2</code>) or turn on <em>Replace</em> to update a report with the same code. Without either, the import stops rather than overwrite anything.</li>
+</ol>
+<p>Images are shared by name: importing a logo called <code>company-logo</code> updates it for every report that uses that name. Full steps: <code>docs/INSTALL.md</code>, <em>Moving reports from development to production</em>.</p>
 
 <h2>6. Good to know</h2>
 <ul>

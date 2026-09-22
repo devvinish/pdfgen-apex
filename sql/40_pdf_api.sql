@@ -20,6 +20,15 @@ create or replace package pdf_repo authid definer as
   procedure log_run(p_code varchar2, p_params varchar2, p_pages number, p_bytes number,
                     p_elapsed_ms number, p_error varchar2);
 
+  -- a report exported as JSON (layout, queries and the images it uses) into this schema; returns its id.
+  -- p_code: the code it gets here (null: the code of the export).
+  -- p_replace: Y replaces a report with that code; N raises -20511 when one exists.
+  -- The caller commits.
+  function import_report(p_json clob, p_code varchar2 default null, p_replace varchar2 default 'N') return number;
+
+  function base64(p_blob blob) return clob;
+  function unbase64(p_data clob) return blob;
+
 end pdf_repo;
 /
 
@@ -57,6 +66,130 @@ create or replace package body pdf_repo as
   exception
     when others then
       rollback;
+  end;
+
+  function base64(p_blob blob) return clob is
+    l_out clob;
+    l_pos number := 1;
+    l_len number := dbms_lob.getlength(p_blob);
+    l_raw raw(32767);
+    c_step constant pls_integer := 12000;     -- a multiple of 3 (the encoded chunk stays under 32K)
+  begin
+    dbms_lob.createtemporary(l_out, true);
+    while l_pos <= l_len loop
+      l_raw := utl_encode.base64_encode(dbms_lob.substr(p_blob, c_step, l_pos));
+      dbms_lob.append(l_out, replace(replace(utl_raw.cast_to_varchar2(l_raw), chr(13)), chr(10)));
+      l_pos := l_pos + c_step;
+    end loop;
+    return l_out;
+  end;
+
+  function unbase64(p_data clob) return blob is
+    l_out   blob;
+    l_start number := 1;
+    l_len   number;
+    l_raw   raw(32767);
+    l_chunk varchar2(32767);
+    c_step  constant pls_integer := 16000;    -- a multiple of 4
+  begin
+    if dbms_lob.instr(p_data, 'base64,') > 0 then
+      l_start := dbms_lob.instr(p_data, 'base64,') + 7;
+    end if;
+    l_len := dbms_lob.getlength(p_data);
+    dbms_lob.createtemporary(l_out, true);
+    while l_start <= l_len loop
+      l_chunk := dbms_lob.substr(p_data, c_step, l_start);
+      l_raw := utl_encode.base64_decode(utl_raw.cast_to_raw(l_chunk));
+      dbms_lob.writeappend(l_out, utl_raw.length(l_raw), l_raw);
+      l_start := l_start + c_step;
+    end loop;
+    return l_out;
+  end;
+
+  function import_report(p_json clob, p_code varchar2 default null, p_replace varchar2 default 'N') return number is
+    l_in     json_object_t;
+    l_code   varchar2(60);
+    l_name   varchar2(200);
+    l_desc   varchar2(4000);
+    l_layout clob;
+    l_id     number;
+    l_arr    json_array_t;
+    l_o      json_object_t;
+    l_sql    clob;
+    l_alias  varchar2(10);
+    l_title  varchar2(200);
+    l_iname  varchar2(200);
+    l_blob   blob;
+    l_w      number;
+    l_h      number;
+    l_c      number;
+  begin
+    begin
+      l_in := json_object_t.parse(p_json);
+    exception
+      when others then
+        raise_application_error(-20510, 'This is not valid JSON.');
+    end;
+    if not l_in.has('layout') or not l_in.get('layout').is_object then
+      raise_application_error(-20510, 'This is not a report exported by the PDF Report Designer.');
+    end if;
+    l_code := upper(trim(coalesce(p_code, l_in.get_string('code'))));
+    if l_code is null or not regexp_like(l_code, '^[A-Z][A-Z0-9_]*$') then
+      raise_application_error(-20512, 'The code "' || l_code || '" is not valid: it starts with a letter and has only letters, digits and _.');
+    end if;
+    -- (the methods of the JSON objects cannot be called inside SQL)
+    l_name := substr(l_in.get_string('name'), 1, 200);
+    l_desc := substr(l_in.get_string('description'), 1, 4000);
+    l_layout := l_in.get_object('layout').to_clob;
+    begin
+      select report_id into l_id from pdf_reports where code = l_code;
+    exception
+      when no_data_found then
+        l_id := null;
+    end;
+    if l_id is not null and upper(nvl(p_replace, 'N')) not in ('Y', 'YES', 'TRUE') then
+      raise_application_error(-20511, 'A report with the code ' || l_code || ' exists already. ' ||
+                                      'Import it under a new code, or choose to replace it.');
+    end if;
+    if l_id is null then
+      insert into pdf_reports (code, name, description, layout)
+      values (l_code, nvl(l_name, l_code), l_desc, l_layout)
+      returning report_id into l_id;
+    else
+      update pdf_reports
+         set name = nvl(l_name, name), description = l_desc, layout = l_layout,
+             updated_by = coalesce(v('APP_USER'), user), updated_on = sysdate
+       where report_id = l_id;
+    end if;
+    -- the queries
+    delete from pdf_queries where report_id = l_id;
+    l_arr := case when l_in.has('queries') and l_in.get('queries').is_array then l_in.get_array('queries') else json_array_t() end;
+    for i in 0 .. l_arr.get_size - 1 loop
+      l_o := treat(l_arr.get(i) as json_object_t);
+      l_sql := l_o.get_clob('sql');
+      l_alias := upper(l_o.get_string('alias'));
+      l_title := substr(l_o.get_string('title'), 1, 200);
+      if trim(dbms_lob.substr(l_sql, 4000, 1)) is not null then
+        insert into pdf_queries (report_id, alias, seq, title, sql_text)
+        values (l_id, l_alias, i + 1, l_title, l_sql);
+      end if;
+    end loop;
+    -- the images it uses: added, or replaced by the exported ones
+    l_arr := case when l_in.has('images') and l_in.get('images').is_array then l_in.get_array('images') else json_array_t() end;
+    for i in 0 .. l_arr.get_size - 1 loop
+      l_o := treat(l_arr.get(i) as json_object_t);
+      l_iname := substr(trim(l_o.get_string('name')), 1, 200);
+      if l_iname is not null and l_o.has('data') then
+        l_blob := unbase64(l_o.get_clob('data'));
+        pdf_writer.jpeg_info(l_blob, l_w, l_h, l_c);
+        merge into pdf_images i
+        using (select l_iname name from dual) s on (i.name = s.name)
+        when matched then update set content = l_blob, width = l_w, height = l_h, mime_type = 'image/jpeg'
+        when not matched then insert (name, mime_type, width, height, content)
+                              values (l_iname, 'image/jpeg', l_w, l_h, l_blob);
+      end if;
+    end loop;
+    return l_id;
   end;
 
 end pdf_repo;
