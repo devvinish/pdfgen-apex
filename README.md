@@ -6,6 +6,9 @@ Design PDF documents (invoices, statements, labels, reports) on a canvas, bind t
 generate them from any APEX application with one PL/SQL call. No BI Publisher, no Word templates, no
 print server: everything runs inside the database.
 
+**See it first:** screenshots of the designer, sample PDFs and a step-by-step tutorial are on
+**[vinish.dev: VinAura, the PDF report designer for Oracle APEX](https://vinish.dev/vinaura-pdf-report-designer-oracle-apex)**.
+
 ```sql
 l_pdf := pdfgen.pdf_api.generate('INVOICE');                                   -- page items from session state
 l_pdf := pdfgen.pdf_api.generate('INVOICE', apex_t_varchar2('P11_INVOICE_ID', 1003));
@@ -16,6 +19,9 @@ pdfgen.pdf_api.download('INVOICE');                                            -
 
 What the database and APEX need for development and production, with or without the demo tables and data:
 **[docs/INSTALL.md](docs/INSTALL.md)**.
+
+New to VinAura? The [tutorial](https://vinish.dev/vinaura-pdf-report-designer-oracle-apex#va-tutorial) walks
+through a first report: the queries, the layout, the PDF in a dialog, and moving reports to production.
 
 ## What is where
 
