@@ -137,13 +137,13 @@ For a single report, or when the designer application runs in the target too.
 
 1. **Development:** on **Reports**, click **JSON** in the *Export* column of the report. You get
    `<code>.pdfreport.json`, with the report's images inside.
-2. **Target:** in the designer application there, go to **New Report > Import a Report (JSON)**:
+2. **Target:** in the designer application there, click **Import** on the *Reports* page. A dialog opens:
    1. Choose the `.json` file. For a small report you can paste its text instead.
-   2. **Code here:** leave it empty to keep the code of the export. Give a new code, for example
-      `INVOICE_V2`, to add the report next to one that has the same code.
-   3. **Replace the report with this code if it exists:** leave it off, and the import stops with a message
-      when that code is taken, so nothing is overwritten. Turn it on to update the existing report.
-   4. **Import.** The designer opens with the imported report.
+   2. **Code of the new report:** leave it empty to keep the code of the export. If that code is taken,
+      give a new one, for example `INVOICE_V2`.
+   3. **Update the report if this code exists:** leave it off, and the import only adds reports: when the
+      code is taken it stops with a message, so nothing is overwritten. Turn it on to update that report.
+   4. **Import.** The dialog closes and the designer opens with the imported report.
 
 The same import from PL/SQL, as the schema that owns the tables:
 

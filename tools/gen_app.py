@@ -135,7 +135,7 @@ def plugin_settings(exp, ctx):
 
 
 # (label, page, icon, current pages, children)
-NAV = [('Reports', 1, 'fa-file-pdf-o', '1,2,3', None),
+NAV = [('Reports', 1, 'fa-file-pdf-o', '1,2,3,9', None),
        ('Demo', None, 'fa-desktop', None, [('Invoices', 10, 'fa-file-text-o', '10,11'),
                                             ('Customers', 20, 'fa-users', '20,21'),
                                             ('Products', 30, 'fa-cubes', '30,31')]),
@@ -416,6 +416,8 @@ def page_reports(ctx):
     ], seq=10, sort=('NAME', 'ASC'), rows=50)
     p.button('CREATE', 'New Report', r, action='REDIRECT_URL', position='RIGHT_OF_IR_SEARCH_BAR', hot=True,
              icon='fa-plus', url='f?p=&APP_ID.:3:&SESSION.::&DEBUG.:RP,3::')
+    p.button('IMPORT', 'Import', r, action='REDIRECT_PAGE', position='RIGHT_OF_IR_SEARCH_BAR', seq=20,
+             icon='fa-upload', url='f?p=&APP_ID.:9:&SESSION.::&DEBUG.:RP,9::')
     return p
 
 
@@ -456,17 +458,17 @@ IMPORT_REPORT = """declare
   l_warn integer;
 begin
   -- the exported .json file, or the JSON pasted in the text area
-  if :P3_IMPORT_FILE is not null then
-    select blob_content into l_blob from apex_application_temp_files where name = :P3_IMPORT_FILE;
+  if :P9_FILE is not null then
+    select blob_content into l_blob from apex_application_temp_files where name = :P9_FILE;
     dbms_lob.createtemporary(l_json, true);
     dbms_lob.converttoclob(l_json, l_blob, dbms_lob.lobmaxsize, l_dest, l_src, nls_charset_id('AL32UTF8'), l_ctx, l_warn);
   else
-    l_json := :P3_IMPORT;
+    l_json := :P9_JSON;
   end if;
   if l_json is null or dbms_lob.getlength(l_json) = 0 then
     raise_application_error(-20513, 'Choose the exported .json file, or paste its JSON.');
   end if;
-  :P3_REPORT_ID := pdf_designer.import_json(l_json, :P3_IMPORT_CODE, :P3_IMPORT_REPLACE);
+  :P9_REPORT_ID := pdf_designer.import_json(l_json, :P9_CODE, nvl(:P9_REPLACE, 'N'));
 exception
   when others then
     -- the reasons of the import (exists already, not valid JSON ...) without the ORA- number
@@ -504,24 +506,37 @@ def page_new(ctx):
                  'A report with this code exists already.', seq=20, button=create)
     p.process('Create the report', NEW_REPORT, button=create, seq=10)
 
-    ri = p.static('Import a Report (JSON)', seq=20, options='#DEFAULT#:is-collapsed:js-useLocalStorage:t-Region--scrollBody',
-                  template='region_collapsible')
-    p.static('Import help', seq=5, parent=ri, template='region_blank', html=(
-        '<p>Brings in a report exported from another workspace or database (Reports &gt; Export): its layout, '
-        'its queries and the images it uses. To move several reports to production in one go, use '
-        '<a href="f?p=&APP_ID.:8:&SESSION.">Deploy</a>.</p>'))
-    p.item('P3_IMPORT_FILE', ri, kind='file', label='Exported report (.json file)',
-           attrs_={'file_types': '.json', 'dropzone_title': 'Choose or drop the .json file'})
-    p.item('P3_IMPORT', ri, kind='textarea', label='Or paste its JSON', height=4,
-           inline_help='Pasting works for small reports; a report with images is better imported as a file.')
-    p.item('P3_IMPORT_CODE', ri, label='Code here', maxlen=60, placeholder='the code of the export',
-           inline_help='Leave it empty to keep the code of the export. Give a new code (e.g. INVOICE_V2) '
-                       'to add it as a new report next to the one you have.')
-    p.item('P3_IMPORT_REPLACE', ri, kind='yesno', label='Replace the report with this code if it exists', default='N',
-           inline_help='Off: the import stops when a report with this code exists, so nothing is overwritten.')
-    imp = p.button('IMPORT', 'Import', ri, position='NEXT', validations='N')
-    p.process('Import the report', IMPORT_REPORT, button=imp, seq=20, success='Report imported.')
     p.branch('f?p=&APP_ID.:2:&SESSION.::&DEBUG.::P2_REPORT_ID:&P3_REPORT_ID.', seq=10)
+    return p
+
+
+IMPORT_HELP = """<p>Brings in a report exported from another workspace or database (<em>Export</em> column
+of Reports): its layout, its queries and the images it uses. It is added as a new report, and the designer opens
+with it.</p>"""
+
+
+def page_import(ctx):
+    p = Page(ctx.app, 9, 'Import Report', 'IMPORT-REPORT', title='Import a Report', mode='MODAL', group=ctx.group_main,
+             component_map='02', dialog_width='640')
+    p.static('Import help', seq=5, template='region_blank', html=IMPORT_HELP)
+    r = p.static('Import', seq=10, template='region_blank')
+    p.item('P9_FILE', r, kind='file', label='Exported report (.json file)',
+           attrs_={'file_types': '.json', 'dropzone_title': 'Choose or drop the .json file'})
+    p.item('P9_JSON', r, kind='textarea', label='Or paste its JSON', height=3,
+           inline_help='Pasting works for small reports; a report with images is better imported as a file.')
+    p.item('P9_CODE', r, label='Code of the new report', maxlen=60, placeholder='empty: the code of the export',
+           inline_help='Your applications call the report by it. If the export\'s code is taken here, give a new one, '
+                       'e.g. INVOICE_V2.')
+    p.item('P9_REPLACE', r, kind='yesno', label='Update the report if this code exists', default='N',
+           inline_help='Off: the import only adds reports and never overwrites one.')
+    p.item('P9_REPORT_ID', r, kind='hidden', protection='N')
+    bar = p.buttons_bar()
+    cancel = p.button('CANCEL', 'Cancel', bar, action='DEFINED_BY_DA', position='PREVIOUS', seq=10)
+    p.da('Close the dialog', 'click', [{'action': 'NATIVE_DIALOG_CANCEL'}], button=cancel, element_type='BUTTON')
+    imp = p.button('IMPORT', 'Import', bar, position='NEXT', seq=10, hot=True, icon='fa-upload')
+    p.process('Import the report', IMPORT_REPORT, button=imp, seq=10)
+    # to the designer with the new report (the dialog closes)
+    p.branch('f?p=&APP_ID.:2:&SESSION.::&DEBUG.::P2_REPORT_ID:&P9_REPORT_ID.', seq=10)
     return p
 
 
@@ -726,7 +741,7 @@ def build(app_id, no_auth, name, alias, with_objects):
     app = App(Ids())
     ctx = Ctx(app)
     pages = [page_reports(ctx), page_designer(ctx), page_new(ctx), page_try(ctx), page_export(ctx),
-             page_log(ctx), page_help(ctx), page_deploy(ctx)] + demo_pages.pages(ctx)
+             page_log(ctx), page_help(ctx), page_deploy(ctx), page_import(ctx)] + demo_pages.pages(ctx)
     if not no_auth:
         pages.append(login(ctx))
     exp = Export()

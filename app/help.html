@@ -120,7 +120,7 @@ l_pdf := pdf_api.generate('PRODUCT_LABELS',
 <p><strong>One report, with this application on both sides: Export and Import.</strong></p>
 <ol>
   <li>On <strong>Reports</strong>, the <em>JSON</em> link in the <em>Export</em> column downloads the report, images included.</li>
-  <li>In the other environment, <strong>New Report &gt; Import a Report (JSON)</strong>: choose the file, then either give it a new code (for example <code>INVOICE_V2</code>) or turn on <em>Replace</em> to update a report with the same code. Without either, the import stops rather than overwrite anything.</li>
+  <li>In the other environment, click <strong>Import</strong> on <strong>Reports</strong>. In the dialog, choose the file and, if its code is taken there, give it a new one (for example <code>INVOICE_V2</code>), or turn on <em>Update the report if this code exists</em>. Otherwise the import stops rather than overwrite anything. After the import the designer opens with the report.</li>
 </ol>
 <p>Images are shared by name: importing a logo called <code>company-logo</code> updates it for every report that uses that name. Full steps: <code>docs/INSTALL.md</code>, <em>Moving reports from development to production</em>.</p>
 

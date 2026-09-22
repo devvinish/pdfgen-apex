@@ -26,7 +26,7 @@ What the database and APEX need for development and production, with or without 
 | Local test copy | **2099**, no login (for automated testing only), alias `PDF_DESIGNER_TEST` |
 | Export to import anywhere | `dist/pdf_report_designer.sql` (application + supporting objects) |
 
-The pages: **Reports** (list, New Report, Import/Export JSON), **Designer**, **Try the API**, **Deploy**
+The pages: **Reports** (list, New Report, an Import dialog, Export JSON), **Designer**, **Try the API**, **Deploy**
 (a SQL script that moves reports and their images to production), **Log**, **How to Use**, and the **Demo** menu:
 
 | Page | |
