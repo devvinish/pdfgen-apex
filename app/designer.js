@@ -32,6 +32,13 @@ window.pdfd = (function ($) {
     courier: '"Courier New", Courier, monospace'
   };
   // the fonts of the PDF (the Arial ones are look-alikes made from Helvetica: no font files needed)
+  var CHARSETS = [
+    ['WE', 'Western European (English, French, German, Spanish, Italian ...)'],
+    ['CE', 'Central European (Croatian, Czech, Polish, Slovak, Slovenian, Hungarian, Romanian)'],
+    ['BALTIC', 'Baltic (Estonian, Latvian, Lithuanian)'],
+    ['TURKISH', 'Turkish']
+  ];
+
   var FONT_OPTIONS = [['helvetica', 'Helvetica'], ['arial', 'Arial'], ['arialnarrow', 'Arial Narrow'],
     ['arialblack', 'Arial Black'], ['times', 'Times'], ['courier', 'Courier']];
   var MASKS = ['FM999G999G990D00', 'FM999G999G990', 'FM990D00', 'FM990D0', 'DD-MON-YYYY', 'DD-Mon-YYYY',
@@ -1646,6 +1653,11 @@ window.pdfd = (function ($) {
       sizeSel.appendChild(o);
     });
     var orient = h('div', { class: 'pdfd-seg', role: 'radiogroup', 'aria-label': 'Orientation' });
+    var charSel = h('select', { class: 'pdfd-input', id: 'pdfd-ps-charset' }, CHARSETS.map(function (o) {
+      var e = h('option', { value: o[0], text: o[1] });
+      if (o[0] === (S.layout.charset || 'WE')) { e.selected = true; }
+      return e;
+    }));
     var unitSel = h('select', { class: 'pdfd-input', id: 'pdfd-ps-unit' }, [['mm', 'Millimetres'], ['in', 'Inches'], ['pt', 'Points']].map(function (o) {
       var e = h('option', { value: o[0], text: o[1] }); if (o[0] === w.unit) { e.selected = true; } return e;
     }));
@@ -1691,7 +1703,9 @@ window.pdfd = (function ($) {
       h('div', { class: 'pdfd-field' }, [h('label', { for: 'pdfd-ps-size', text: 'Page size' }), sizeSel]),
       h('div', { class: 'pdfd-field' }, [h('label', { text: 'Orientation' }), orient]),
       fld('Width', wIn, 'pdfd-ps-w', true), fld('Height', hIn, 'pdfd-ps-h', true),
-      h('div', { class: 'pdfd-field' }, [h('label', { for: 'pdfd-ps-unit', text: 'Units of the designer' }), unitSel])
+      h('div', { class: 'pdfd-field' }, [h('label', { for: 'pdfd-ps-unit', text: 'Units of the designer' }), unitSel]),
+      h('div', { class: 'pdfd-field' }, [h('label', { for: 'pdfd-ps-charset', text: 'Characters (language)' }), charSel,
+        h('div', { class: 'pdfd-fhint', text: 'The standard fonts print one group of characters at a time. Choose the group your texts need.' })])
     ]));
     body.appendChild(h('h4', { class: 'pdfd-setup-h', text: 'Margins' }));
     body.appendChild(h('div', { class: 'pdfd-setup-grid' }, ['top', 'right', 'bottom', 'left'].map(function (k) {
@@ -1723,6 +1737,7 @@ window.pdfd = (function ($) {
           if (w.margin.left + w.margin.right >= w.width - 20 || w.margin.top + w.margin.bottom >= w.height - 20) { toast('The margins leave no room on the page.', true); return false; }
           checkpoint();
           S.layout.page = w;
+          S.layout.charset = charSel.value;
           if (lab) { S.layout.labels = lab; S.layout.bands.label.height = lab.height; }
           setDirty();
           renderCanvas();

@@ -98,8 +98,10 @@ How to Use page is `app/help.html`. `local/` (passwords, logs, test output) is n
 ## Limits of version 1
 
 - Fonts: the 14 standard PDF fonts, plus Arial, Arial Narrow and Arial Black as look-alikes made from
-  Helvetica (Western European characters). The rupee sign prints as `Rs.`;
-  Hindi and other scripts need embedded TrueType fonts (a next step).
+  Helvetica. The rupee sign prints as `Rs.`; Hindi and other scripts need embedded TrueType fonts (a next step).
+- Characters: one code page per report (*Page setup > Characters*): Western European (default), Central
+  European (Croatian, Czech, Polish, Slovak, Slovenian, Hungarian, Romanian), Baltic or Turkish. Greek,
+  Cyrillic and mixed scripts need embedded fonts.
 - Images are JPEG (uploads are converted in the browser). Barcodes: Code 128 (QR is a next step).
 - Content streams are not compressed (a one-page invoice is about 30 KB).
 - A table row is never split across pages.

@@ -9,6 +9,13 @@ create or replace package pdf_writer authid definer as
 
   procedure init(p_title varchar2 default null, p_author varchar2 default null);
 
+  -- the characters the text may hold. The standard fonts hold one code page at a time:
+  --   WE       Western European  (Windows-1252): the default; English, French, German, Spanish, Italian ...
+  --   CE       Central European  (Windows-1250): Croatian, Czech, Polish, Slovak, Slovenian, Hungarian, Romanian
+  --   BALTIC   Baltic            (Windows-1257): Estonian, Latvian, Lithuanian
+  --   TURKISH  Turkish           (Windows-1254)
+  procedure set_charset(p_charset varchar2);
+
   -- adds a page and makes it the current one; returns its number (1, 2, ...)
   function  new_page(p_width number, p_height number) return pls_integer;
   -- makes an existing page the current one (to draw page headers / footers afterwards)
@@ -70,6 +77,7 @@ create or replace package body pdf_writer as
   g_fonts   t_str;          -- base font name -> resource name (F1, F2 ...)
   g_title   varchar2(4000);
   g_author  varchar2(4000);
+  g_charset varchar2(10) := 'WE';     -- WE | CE | BALTIC | TURKISH
 
   -- glyph widths (1/1000 em) of the characters 32..126
   w_helv    t_widths;
@@ -79,6 +87,11 @@ create or replace package body pdf_writer as
 
   g_out     blob;
   g_offsets t_offsets;
+
+  -- the glyphs of a code page that are not in WinAnsiEncoding, as a PDF /Differences list
+  c_diff_ce      constant varchar2(700) := '140 /Sacute /Tcaron 143 /Zacute 156 /sacute /tcaron 159 /zacute 161 /caron /breve /Lslash 165 /Aogonek 170 /Scedilla 175 /Zdotaccent 178 /ogonek /lslash 185 /aogonek /scedilla 188 /Lcaron /hungarumlaut /lcaron /zdotaccent /Racute 195 /Abreve 197 /Lacute /Cacute 200 /Ccaron 202 /Eogonek 204 /Ecaron 207 /Dcaron /Dcroat /Nacute /Ncaron 213 /Ohungarumlaut 216 /Rcaron /Uring 219 /Uhungarumlaut 222 /Tcommaaccent 224 /racute 227 /abreve 229 /lacute /cacute 232 /ccaron 234 /eogonek 236 /ecaron 239 /dcaron /dcroat /nacute /ncaron 245 /ohungarumlaut 248 /rcaron /uring 251 /uhungarumlaut 254 /tcommaaccent /dotaccent';
+  c_diff_baltic  constant varchar2(700) := '141 /dieresis /caron /cedilla 157 /macron /ogonek 168 /Oslash 170 /Rcedilla 175 /AE 184 /oslash 186 /rcedilla 191 /ae /Aogonek /Iogonek /Amacron /Cacute 198 /Eogonek /Emacron /Ccaron 202 /Zacute /Edotaccent /Gcedilla /Kcedilla /Imacron /Lcedilla /Scaron /Nacute /Ncedilla 212 /Omacron 216 /Uogonek /Lslash /Sacute /Umacron 221 /Zdotaccent /Zcaron 224 /aogonek /iogonek /amacron /cacute 230 /eogonek /emacron /ccaron 234 /zacute /edotaccent /gcedilla /kcedilla /imacron /lcedilla /scaron /nacute /ncedilla 244 /omacron 248 /uogonek /lslash /sacute /umacron 253 /zdotaccent /zcaron /dotaccent';
+  c_diff_turkish constant varchar2(200) := '208 /Gbreve 221 /Idotaccent /Scedilla 240 /gbreve 253 /dotlessi /scedilla';
 
   c_helv   constant varchar2(1000) := '278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584';
   c_helvb  constant varchar2(1000) := '278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584';
@@ -224,6 +237,7 @@ create or replace package body pdf_writer as
     l_font  varchar2(20) := lower(nvl(p_font, 'helvetica'));
     l_bold  boolean := nvl(p_bold, false);
     l_scale number := 1;
+    l_text  varchar2(32767) := p_text;
   begin
     -- the look-alikes of Arial: Helvetica metrics, scaled
     if l_font = 'arialnarrow' then
@@ -241,9 +255,14 @@ create or replace package body pdf_writer as
     if l_font = 'courier' then
       return length(p_text) * 600 * p_size / 1000;
     end if;
+    -- an accented letter is about as wide as the letter it is made of (c for c-caron), and this is
+    -- how Oracle converts it; the width tables hold the plain letters
+    if g_charset <> 'WE' then
+      l_text := utl_raw.cast_to_varchar2(utl_i18n.string_to_raw(p_text, 'US7ASCII'));
+    end if;
     l_def := case when l_font = 'times' then 500 else 556 end;
-    for i in 1 .. length(p_text) loop
-      l_c := ascii(substr(p_text, i, 1));
+    for i in 1 .. length(l_text) loop
+      l_c := ascii(substr(l_text, i, 1));
       if l_c between 32 and 126 then
         l_total := l_total + case
                                when l_font = 'times' and l_bold then w_timesb(l_c)
@@ -258,13 +277,42 @@ create or replace package body pdf_writer as
     return l_total * p_size / 1000 * l_scale;
   end;
 
-  -- the text in WinAnsi (Windows-1252) bytes, as a PDF hex string
+  function oracle_charset return varchar2 is
+  begin
+    return case g_charset
+             when 'CE' then 'EE8MSWIN1250'
+             when 'BALTIC' then 'BLT8MSWIN1257'
+             when 'TURKISH' then 'TR8MSWIN1254'
+             else 'WE8MSWIN1252'
+           end;
+  end;
+
+  function differences return varchar2 is
+  begin
+    return case g_charset
+             when 'CE' then c_diff_ce
+             when 'BALTIC' then c_diff_baltic
+             when 'TURKISH' then c_diff_turkish
+           end;
+  end;
+
+  procedure set_charset(p_charset varchar2) is
+  begin
+    g_charset := case upper(trim(p_charset))
+                   when 'CE' then 'CE'
+                   when 'BALTIC' then 'BALTIC'
+                   when 'TURKISH' then 'TURKISH'
+                   else 'WE'
+                 end;
+  end;
+
+  -- the text in the bytes of the document's code page, as a PDF hex string
   function win_hex(p_text varchar2) return varchar2 is
     l varchar2(32767) := p_text;
   begin
-    -- the rupee sign is not in WinAnsi
+    -- the rupee sign is in none of the code pages
     l := replace(l, unistr('\20B9'), 'Rs.');
-    return '<' || rawtohex(utl_i18n.string_to_raw(l, 'WE8MSWIN1252')) || '>';
+    return '<' || rawtohex(utl_i18n.string_to_raw(l, oracle_charset)) || '>';
   end;
 
   procedure text(p_x number, p_y number, p_text varchar2, p_font varchar2, p_bold boolean,
@@ -538,7 +586,13 @@ create or replace package body pdf_writer as
     while l_key is not null loop
       obj_begin(l_font_base + to_number(substr(g_fonts(l_key), 2)) - 1);
       wa('<< /Type /Font /Subtype /Type1 /BaseFont /' || l_key ||
-         case when l_key not in ('Symbol', 'ZapfDingbats') then ' /Encoding /WinAnsiEncoding' end ||
+         case
+           when l_key in ('Symbol', 'ZapfDingbats') then null
+           when differences is null then ' /Encoding /WinAnsiEncoding'
+           -- WinAnsi, with the letters of the code page that it does not have
+           else ' /Encoding << /Type /Encoding /BaseEncoding /WinAnsiEncoding /Differences [' ||
+                differences || '] >>'
+         end ||
          ' >>' || chr(10) || 'endobj' || chr(10));
       l_key := g_fonts.next(l_key);
     end loop;

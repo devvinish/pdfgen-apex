@@ -126,7 +126,8 @@ l_pdf := pdf_api.generate('PRODUCT_LABELS',
 
 <h2>6. Good to know</h2>
 <ul>
-  <li>Fonts: Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier (regular, bold, italic). Arial, Arial Narrow and Arial Black are close look-alikes made from Helvetica, so no font files are needed. They print the characters of Western European languages; the rupee sign prints as <code>Rs.</code></li>
+  <li>Fonts: Helvetica, Arial, Arial Narrow, Arial Black, Times and Courier (regular, bold, italic). Arial, Arial Narrow and Arial Black are close look-alikes made from Helvetica, so no font files are needed. The rupee sign prints as <code>Rs.</code></li>
+  <li>Characters: <strong>Page setup &gt; Characters (language)</strong> chooses the group of characters a report prints: <em>Western European</em> (the default: English, French, German, Spanish, Italian ...), <em>Central European</em> (Croatian, Czech, Polish, Slovak, Slovenian, Hungarian, Romanian), <em>Baltic</em> (Estonian, Latvian, Lithuanian) or <em>Turkish</em>. One group per report: letters outside it are printed without their accents.</li>
   <li>Images: uploads (PNG, JPEG, ...) are stored as JPEG. An image can also come from a BLOB column holding a JPEG: <code>{Q1.PHOTO}</code>.</li>
   <li>Barcodes: Code 128. A table row grows with long text; a row is never split across pages.</li>
   <li>Every PDF made through <code>pdf_api</code> is logged (Log): who, which report, pages, time, errors. The log keeps 90 days.</li>

@@ -76,6 +76,7 @@ create or replace package body pdf_engine as
   g_cw         number;      -- content width
 
   g_font       varchar2(20);
+  g_charset    varchar2(10);   -- the code page of the document
   g_size       number;
   g_color      varchar2(20);
 
@@ -1302,11 +1303,14 @@ create or replace package body pdf_engine as
     g_ml := jn(l_mar, 'left', 28.35);
     g_cw := g_pw - g_ml - g_mr;
     l_font  := jo(g_layout, 'font');
+    -- the characters the document may hold (WE, CE, BALTIC, TURKISH)
+    g_charset := upper(js(g_layout, 'charset', js(l_font, 'charset', 'WE')));
     g_font  := lower(js(l_font, 'family', 'helvetica'));
     g_size  := jn(l_font, 'size', 9);
     g_color := js(l_font, 'color', '#000000');
     g_images.delete;
     pdf_writer.init(p_title, null);
+    pdf_writer.set_charset(g_charset);
   end;
 
   procedure finish_section is
